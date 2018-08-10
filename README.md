@@ -3,15 +3,15 @@
 SonarQube Delphi
 ================
 Is a SonarQube (http://www.sonarqube.org/) plugin and provides
-  * 49 Rules for Delphi
+  * 53 Rules for Delphi
   * TestCoverage using AQtime (license needed)
    * Optional .html output for TestCoverage
 
-This is Plugin-Version 3.4 SonarQube 5.6.1(LTS) is needed. 
-It is is mainly an updated version of https://github.com/fabriciocolombo/sonar-delphi all credit goes to them.
+This is Plugin-Version 3.5 SonarQube 7.1. 
+It is is mainly an updated version of https://github.com/fabriciocolombo/sonar-delphi and https://github.com/SandroLuck/SonarDelphi all credit goes to them.
 I have hosted it here since the orignal developer isn't active anymore.
 
-This plugin was originally a [Sabre Airline Solutions](http://www.sabreairlinesolutions.com/home/) donation.
+This plugin was originally a [KRISTA] (https://www.krista.ru/) donation.
 
 License
 ---------------------------------------------------------------------------------------
