@@ -22,13 +22,14 @@
  */
 package org.sonar.plugins.delphi;
 
+import java.io.File;
+import java.nio.charset.Charset;
+
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.fs.internal.DefaultInputFile;
+import org.sonar.api.batch.fs.internal.TestInputFileBuilder;
 import org.sonar.plugins.delphi.core.helpers.DelphiProjectHelper;
-
-import java.io.File;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -36,36 +37,40 @@ import static org.mockito.Mockito.when;
 
 public class DelphiTestUtils {
 
-  public static DelphiProjectHelper mockProjectHelper() {
-    DelphiProjectHelper mock = mock(DelphiProjectHelper.class);
-    when(mock.shouldExecuteOnProject()).thenReturn(true);
+    public static DelphiProjectHelper mockProjectHelper() {
+        DelphiProjectHelper mock = mock(DelphiProjectHelper.class);
+        when(mock.shouldExecuteOnProject()).thenReturn(true);
 
-    when(mock.getFile(any(File.class))).thenAnswer(new Answer<InputFile>() {
+        when(mock.getFile(any(File.class))).thenAnswer(new Answer<InputFile>() {
 
-      @Override
-      public InputFile answer(InvocationOnMock invocation) throws Throwable {
-        File file = (File) invocation.getArguments()[0];
-        InputFile inputFile = new DefaultInputFile("ROOT_KEY_CHANGE_AT_SONARAPI_5",file.getAbsolutePath());
+            @Override
+            public InputFile answer(InvocationOnMock invocation) throws Throwable {
+                File file = (File) invocation.getArguments()[0];
+                //InputFile inputFile = new DefaultInputFile("ROOT_KEY_CHANGE_AT_SONARAPI_5", file.getAbsolutePath());
+                InputFile inputFile = TestInputFileBuilder.create("ROOT_KEY_CHANGE_AT_SONARAPI_5", file.getAbsolutePath()).build();
 
-        return inputFile;
-      }
-    });
+                return inputFile;
+            }
+        });
 
-    return mock;
-  }
+        when(mock.encoding()).thenReturn(Charset.defaultCharset().name());
 
-  public static void mockGetFileFromString(DelphiProjectHelper mock) {
-    when(mock.getFile(any(String.class))).thenAnswer(new Answer<InputFile>() {
-      @Override
-      public InputFile answer(InvocationOnMock invocation) throws Throwable {
-        String fileName = (String) invocation.getArguments()[0];
+        return mock;
+    }
 
-        File file = new File(fileName);
-        InputFile inputFile = new DefaultInputFile("ROOT_KEY_CHANGE_AT_SONARAPI_5",file.getPath());
+    public static void mockGetFileFromString(DelphiProjectHelper mock) {
+        when(mock.getFile(any(String.class))).thenAnswer(new Answer<InputFile>() {
+            @Override
+            public InputFile answer(InvocationOnMock invocation) throws Throwable {
+                String fileName = (String) invocation.getArguments()[0];
 
-        return inputFile;
-      }
-    });
-  }
+                File file = new File(fileName);
+                //InputFile inputFile = new DefaultInputFile("ROOT_KEY_CHANGE_AT_SONARAPI_5", file.getPath());
+                InputFile inputFile = TestInputFileBuilder.create("ROOT_KEY_CHANGE_AT_SONARAPI_5", file.getPath()).build();
+
+                return inputFile;
+            }
+        });
+    }
 
 }

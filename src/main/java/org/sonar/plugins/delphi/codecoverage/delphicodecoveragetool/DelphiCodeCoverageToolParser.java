@@ -22,14 +22,14 @@
  */
 package org.sonar.plugins.delphi.codecoverage.delphicodecoveragetool;
 
+import java.io.File;
+import javax.xml.stream.XMLStreamException;
+
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.utils.StaxParser;
 import org.sonar.plugins.delphi.codecoverage.DelphiCodeCoverageParser;
 import org.sonar.plugins.delphi.core.helpers.DelphiProjectHelper;
 import org.sonar.plugins.delphi.utils.DelphiUtils;
-
-import javax.xml.stream.XMLStreamException;
-import java.io.File;
 
 public class DelphiCodeCoverageToolParser implements DelphiCodeCoverageParser
 {
@@ -52,6 +52,7 @@ public class DelphiCodeCoverageToolParser implements DelphiCodeCoverageParser
       parser.parse(reportFile);
     } catch (XMLStreamException e) {
       DelphiUtils.LOG.error("Error parsing file : {}", reportFile);
+      DelphiUtils.LOG.error(e.getMessage());
     }
   }
 }

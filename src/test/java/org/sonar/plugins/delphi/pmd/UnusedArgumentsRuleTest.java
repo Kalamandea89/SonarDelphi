@@ -23,19 +23,17 @@
 package org.sonar.plugins.delphi.pmd;
 
 import org.junit.Test;
-import org.sonar.api.issue.Issue;
-import org.sonar.plugins.delphi.debug.DebugSensorContext;
-
-import java.util.Arrays;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
 
 public class UnusedArgumentsRuleTest extends BasePmdRuleTest {
-
-/*  @Test
+  /*
+  @Test
   public void testRule() {
-    configureTest(ROOT_DIR_NAME + "/UnusedArgumentRule.pas");
+    configureTest(ROOT_DIR_NAME + "\\UnusedArgumentRule.pas");
 
     DebugSensorContext debugContext = new DebugSensorContext();
     sensor.analyse(project, debugContext);
@@ -149,7 +147,7 @@ public class UnusedArgumentsRuleTest extends BasePmdRuleTest {
     assertThat(issues, is(empty()));
   }
 
-/*  @Test
+  @Test
   public void issuesMultipleNestedFunction() {
     DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
 
@@ -179,5 +177,5 @@ public class UnusedArgumentsRuleTest extends BasePmdRuleTest {
     analyse(builder);
 
     assertThat(toString(issues), issues, hasSize(4));
-  }*/
+  }
 }

@@ -22,12 +22,19 @@
  */
 package org.sonar.plugins.delphi.metrics;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.io.FilenameUtils;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.fs.InputFile.Type;
 import org.sonar.api.batch.rule.ActiveRule;
 import org.sonar.api.batch.rule.ActiveRules;
+import org.sonar.api.batch.sensor.issue.NewIssueLocation;
+import org.sonar.api.batch.sensor.issue.internal.DefaultIssueLocation;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.issue.Issuable;
 import org.sonar.api.issue.Issue;
@@ -39,11 +46,6 @@ import org.sonar.plugins.delphi.core.language.FunctionInterface;
 import org.sonar.plugins.delphi.core.language.UnitInterface;
 import org.sonar.plugins.delphi.pmd.DelphiPmdConstants;
 import org.sonar.plugins.delphi.utils.DelphiUtils;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Metric used to search for "dead code" (unused units, unused methods).
@@ -117,10 +119,13 @@ public class DeadCodeMetrics extends DefaultMetrics implements MetricsInterface 
     if (unusedUnits.contains(fileName.toLowerCase())) {
       Issuable issuable = perspectives.as(Issuable.class, resource);
       if (issuable != null) {
+        NewIssueLocation loc = new DefaultIssueLocation()
+          .on(resource)     
+          .at(resource.selectLine(unit.getLine()))
+          .message(unit.getName() + DEAD_UNIT_VIOLATION_MESSAGE);
         Issue issue = issuable.newIssueBuilder()
           .ruleKey(unitRule.ruleKey())
-          .line(unit.getLine())
-          .message(unit.getName() + DEAD_UNIT_VIOLATION_MESSAGE)
+          .at(loc)      
           .build();
         issuable.addIssue(issue);
       }
@@ -160,18 +165,18 @@ public class DeadCodeMetrics extends DefaultMetrics implements MetricsInterface 
       }
 
       if (unusedFunctions.contains(function)) {
-        Issuable issuable = perspectives.as(Issuable.class, resource);
-        if (issuable != null) {
-          Issue issue = issuable.newIssueBuilder()
-            .ruleKey(functionRule.ruleKey())
-            .line(function.getLine())
-            .message(function.getRealName() + DEAD_FUNCTION_VIOLATION_MESSAGE)
-            .build();
+//        Issuable issuable = perspectives.as(Issuable.class, resource);
+//        if (issuable != null) {
+//          Issue issue = issuable.newIssueBuilder()
+//            .ruleKey(functionRule.ruleKey())
+//            .line(function.getLine())
+//            .message(function.getRealName() + DEAD_FUNCTION_VIOLATION_MESSAGE)
+//            .build();
 
           // TODO Unused functions it's not working. There are many
           // false positives.
           // issuable.addIssue(issue);
-        }
+//        }
       }
     }
   }

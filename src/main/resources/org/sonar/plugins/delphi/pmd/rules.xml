@@ -333,18 +333,70 @@
 		<example><![CDATA[
 <b>if</b> <b>Assigned</b>(x) <b>then</b> x.Free;		//WRONG
 
+<b>if</b> <b>Assigned</b>(x) <b>then</b> FreeAndNil(x);		//WRONG
+
 <b>if</b> x &lt;&gt; <b>nil</b> <b>then</b> x.Free;		//WRONG
 
-x.Free;			//GOOD, sufficent enough
+x.Free; 			//GOOD, sufficent enough or better
+<b>FreeAndNil(x);</b> // including repeated calls
  		]]></example>
 	</rule>
+
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.ThenRaiseElseRule" message="You don't must write else then riase exception"
+		  name="ThenRaiseElseRule">
+		<description> Else not need. If condition will be true then will be exception and execution skip this code.
+		</description>
+		<example><![CDATA[
+if a then
+	riase Exception.Create('bla bla bla')
+else
+    DoSomething;   //WRONG
+
+
+if a then
+	riase Exception.Create('bla bla bla')
+
+DoSomething;   //GOOD
+
+ 		]]></example>
+	</rule>
+
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.ThenElseAssignBoolean" message="You don't must assign true else false"
+		  name="ThenElseAssignBoolean">
+		<description> Simple assign condition to variable.
+		</description>
+		<example><![CDATA[
+if a then
+	x := true
+else
+    x := false;   //WRONG
+
+x := a or x := not a;   //GOOD
+
+ 		]]></example>
+	</rule>
+
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.XPathRule" message="Empty 'else' statement"
 		name="EmptyElseStatementRule">
 		<description>You should not write an empty 'else' statement.</description>
 		<properties>
 			<property name="xpath">
-				<value>//else[following-sibling::*[1][name()='end']]</value>
+				<value>//else[following-sibling::*[1][name()='end']] |
+					//else[following::*[1][text()=';']]
+				</value>
+			</property>
+		</properties>
+	</rule>
+
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.XPathRule" message="Empty 'then' statement"
+		  name="EmptyThenStatementRule">
+		<description>You should not write an empty 'then' statement.</description>
+		<properties>
+			<property name="xpath">
+				<value>//then[following-sibling::*[1][name()='end']] |
+					//then[following::*[1][text()=';']]
+				</value>
 			</property>
 		</properties>
 	</rule>
@@ -415,6 +467,11 @@ x.Free;			//GOOD, sufficent enough
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.DestructorWithoutInheritedStatementRule" message="Destructor without 'inherited' statement."
 		name="DestructorWithoutInheritedStatementRule">
 		<description>Destructor without 'inherited' statement.</description>
+	</rule>
+
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.InheritedInDestroyFromTComObjectRule" message="Destructor without 'inherited' statement in descedant TComObject"
+		  name="InheritedInDestroyFromTComObjectRule">
+		<description>Destructor without 'inherited' statement in descedant TComObject.</description>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.NoBeginAfterDoRule" message="No 'begin' after 'do' statement"

@@ -2,20 +2,18 @@ unit GrammarTestNew;
 
 interface
 
-uses Types, SysUtils, System.Classes, System.Generics.Collections , System.Rtti;
-
 Type
   TMyChar = Char;
   TMySetOfChar = set of Char;
-
+  
    AnsiStringAlias = Ansistring;
    AnsiStringAliasNewType = type Ansistring;
-  CyrillicString = type Ansistring(1251);
-
+  CyrillicString = type Ansistring(1251);  
+  
   TPageControl = class(ComCtrls.TPageControl)
   private
     procedure TCMAdjustRect(var Msg: TMessage); message TCM_ADJUSTRECT;
-  end;
+  end;  
 
   TClassA = class;
   IInterfaceA = interface;
@@ -73,16 +71,8 @@ Type
 
   end;
 
-  IList<T> = interface
-
-  end;
-
   IGenericA<T> = interface(IInterfaceA)
     procedure GenProc(Value: T);
-  end;
-
-  IGenericB<TResult, TParam> = interface(IInterfaceA)
-    function GenFunc(const Value: TParam): TResult;
   end;
 
   GenericA<T> = record
@@ -132,24 +122,6 @@ Type
     procedure GenProc(Value: T);
   end;
 
-  TGenericB<TResult, TParam> = class(TGenericA<TParam>, IGenericB<TResult, TParam>)
-  private
-    FOnIdle: TFunc<TResult, TParam>;
-  public
-    procedure AfterConstruction; override;
-    property OnIdle: TProc<TParam> read FOnIdle write FOnIdle;
-    function DoMoreStuff: TParam;
-    procedure GenProc(Value: TParam);
-    function GenFunc(const TParam): TResult; virtual;
-  end;
-
-  TGenericC<T> = class(TGenericB<IList<T>, T>, IGenericB<T, IList<T>>)
-  private
-    FOnIdle: TFunc<IList<T>, T>;
-  public
-    function GenFunc(const T): IList<T>; virtual;
-  end;
-
   TOtherGeneric<T, TResult> = class(TGenericA<T>)
   private
     FOnIdle2: TFunc<T, TResult>;
@@ -171,7 +143,7 @@ Type
 
   TClassType<T,R> = class
   end;
-
+  
   TMyClass = class
 
   end;
@@ -209,6 +181,131 @@ Type
           nWidth, nHeight : Integer;
  		    	hwndParent      : THandle;
      		  nID             : Integer ) : THandle; stdcall; external 'avicap32.dll';
+
+
+const
+	FD_READ       = (1 shl FD_READ_BIT);
+	FD_WRITE      = (1 shl FD_WRITE_BIT);
+	FD_OOB        = (1 shl FD_OOB_BIT);
+	FD_ACCEPT     = (1 shl FD_ACCEPT_BIT);
+	FD_CONNECT    = (1 shl FD_CONNECT_BIT);
+	FD_CLOSE      = (1 shl FD_CLOSE_BIT);
+	FD_QOS        = (1 shl FD_QOS_BIT);
+	FD_GROUP_QOS  = (1 shl FD_GROUP_QOS_BIT);
+
+	FD_ALL_EVENTS = (1 shl FD_MAX_EVENTS) - 1;
+
+type
+  TDef = record
+    FieldClass   : TFieldClass;
+    DisplayLabel : String;
+    FieldKind    : TFieldKind;
+    FieldName    : String;
+    Size         : Integer;
+    DBFieldName  : String;
+    TableAlias   : String;
+    Hidden       : Boolean;
+  end;
+
+const
+  ExtraInfo_ArchiveDocType : THBExtraInfo =
+  (
+    TableName     : 'test';
+    CodeFieldType : cftString;
+    CodeFieldName : 'Code';
+  );
+
+const
+  tablealiasBankExch_Merdoc = 'bm';
+  FieldsCount               = 8;
+
+  joinBankExch_Merdoc =
+    '    left join BankExch_Merdoc %s on (%s = %0:s.ID)';
+
+  Defs : array [0..FieldsCount - 1] of TDef =
+  (
+    (
+      FieldClass   : TStringField;
+      DisplayLabel : 'Информация из ЭО';
+      FieldKind    : fkCalculated;
+      FieldName    : 'ElInfo';
+      Size         : 600;
+      DBFieldName  : '';
+      TableAlias   : tablealiasBankExch_Merdoc;
+      Hidden       : false;
+    ),
+    (
+      FieldClass   : TStringField;
+      DisplayLabel : 'Назначение платежа';
+      FieldKind    : fkData;
+      FieldName    : 'ElNote';
+      Size         : 255;
+      DBFieldName  : 'Note';
+      TableAlias   : tablealiasBankExch_Merdoc;
+      Hidden       : false;
+
+    ),
+    (
+      FieldClass   : TStringField;
+      DisplayLabel : 'Наименование плательщика';
+      FieldKind    : fkData;
+      FieldName    : 'ElPayerName';
+      Size         : 255;
+      DBFieldName  : 'PayerName';
+      TableAlias   : tablealiasBankExch_Merdoc;
+      Hidden       : false;
+    ),
+    (
+      FieldClass   : TFloatField;
+      DisplayLabel : 'ИНН';
+      FieldKind    : fkData;
+      FieldName    : 'ElPayerINN';
+      DBFieldName  : 'INNMFKB';
+      TableAlias   : tablealiasBankExch_Merdoc;
+      //todo: DisplayFormat = '0000000000'
+      Hidden       : false;
+    ),
+    (
+      FieldClass   : TStringField;
+      DisplayLabel : 'КПП';
+      FieldKind    : fkData;
+      FieldName    : 'ElPayerKPP';
+      Size         : 20;
+      DBFieldName  : 'KPPA';
+      TableAlias   : tablealiasBankExch_Merdoc;
+      Hidden       : false;
+    ),
+    (
+      FieldClass   : TStringField;
+      DisplayLabel : 'Счет';
+      FieldKind    : fkData;
+      FieldName    : 'ElPayerAcc';
+      Size         : 20;
+      DBFieldName  : 'LSKL';
+      TableAlias   : tablealiasBankExch_Merdoc;
+      Hidden       : false;
+    ),
+    (
+      FieldClass   : TStringField;
+      DisplayLabel : 'Банк';
+      FieldKind    : fkData;
+      FieldName    : 'ElPayerBank';
+      Size         : 255;
+      DBFieldName  : 'SourceBankName';
+      TableAlias   : tablealiasBankExch_Merdoc;
+      Hidden       : false;
+    ),
+    (
+      FieldClass   : TStringField;
+      DisplayLabel : 'БИК';
+      FieldKind    : fkData;
+      FieldName    : 'ElPayerBIK';
+      Size         : 10;
+      DBFieldName  : 'MFKB';
+      TableAlias   : tablealiasBankExch_Merdoc;
+      Hidden       : false;
+    )
+  );
 
 implementation
 
@@ -436,7 +533,7 @@ type
 
 var
   custRecPtr : ^TCustomer;
-
+  
 procedure CustomerCreate;
 begin
   // Create a customer record using 'New'
@@ -445,54 +542,29 @@ begin
 	  // Assign values to it
 	  custRecPtr.name := 'Her indoors';
 	  custRecPtr.age  := 55;
-
+	
 	  // Now display these values
 	  ShowMessageFmt('%s is %d',[custRecPtr.name, custRecPtr.age]);
-
+	
 	  // Now dispose of this allocated record
   finally
     Dispose(custRecPtr);
-  end;
-end;
-
+  end;  
+end;  
+  
 procedure ExportPDF(Crystal: TCrpe; FileName: string);
 begin
   Crystal.PrintOptions.Retrieve;
   Crystal.Output := toExport;
   Crystal.Export.FileType := AdobeAcrobatPDF; //Export keyword
-  Crystal.Export.FileName := FileName;
+  Crystal.Export.FileName := FileName; 
   Crystal.Export.PromptForOptions := False;
   Crystal.ProgressDialog := False;
-end;
+end;  
 
 function Test: LongInt;
 begin
   Result := LongInt(PAnsiChar(AnsiString(Result))); //AnsiString cast
-end;
-
-function AnonymousInlineMethodCallsTest: MyResult;
-begin
-  DoSomethingWithSimpleAnonymousInlineProcedureWithoutArgs1(procedure begin Beep; end);
-  DoSomethingWithSimpleAnonymousInlineProcedureWithoutArgs2(procedure begin Beep end);
-
-  DoSomethingWithSimpleAnonymousInlineProcedureWithArgs1(procedure begin Beep(Time) end);
-  DoSomethingWithSimpleAnonymousInlineProcedureWithArgs2(procedure begin Beep(Time); end);
-
-  DoSomethingWithAnonymousInlineProcedureWithoutArgs(
-    procedure
-    begin
-      DoSomething1;
-      DoSomething2(Index, 1, true, a[x], 'foo', bar);
-    end);
-
-  DoSomethingWithAnonymousInlineProcedureWithArgs(
-    procedure(const a1: Integer; a2: string; var a3: Extended)
-    begin
-      DoSomething1;
-      DoSomething2(Index, 1, true, a[x], 'foo', bar);
-    end);
-
-  TFoo.InvokeOnBar(procedure begin FFooMemberObj.DoSomeFooBar end);
 end;
 
 initialization

@@ -22,8 +22,8 @@ import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.sonar.plugins.delphi.IssueMatchers.hasRuleKey;
-import static org.sonar.plugins.delphi.IssueMatchers.hasRuleLine;
+import static org.sonar.plugins.delphi.HasRuleKey.hasRuleKey;
+import static org.sonar.plugins.delphi.HasRuleLineNumber.hasRuleLine;
 
 public class TypeAliasRuleTest extends BasePmdRuleTest {
 
@@ -39,7 +39,7 @@ public class TypeAliasRuleTest extends BasePmdRuleTest {
     assertThat(issues, is(empty()));
   }
 
-/*  @Test
+  @Test
   public void typeAliasShouldAddViolation() {
     DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
 
@@ -50,9 +50,9 @@ public class TypeAliasRuleTest extends BasePmdRuleTest {
 
     assertThat(toString(issues), issues, hasSize(1));
     assertThat(toString(issues), issues, hasItem(allOf(hasRuleKey("TypeAliasRule"), hasRuleLine(builder.getOffsetDecl() + 2))));
-  }*/
+  }
 
-/*  @Test
+  @Test
   public void typeAliasNewTypeShouldAddViolation() {
     DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
 
@@ -63,7 +63,7 @@ public class TypeAliasRuleTest extends BasePmdRuleTest {
 
     assertThat(toString(issues), issues, hasSize(1));
     assertThat(toString(issues), issues, hasItem(allOf(hasRuleKey("TypeAliasRule"), hasRuleLine(builder.getOffsetDecl() + 2))));
-  }*/
+  }
 
   @Test
   public void falsePositiveMetaClassIsNotTypeAlias() {

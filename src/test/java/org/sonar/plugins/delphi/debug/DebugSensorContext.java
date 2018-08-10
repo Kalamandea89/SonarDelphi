@@ -22,6 +22,13 @@
  */
 package org.sonar.plugins.delphi.debug;
 
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import org.sonar.api.SonarRuntime;
 import org.sonar.api.batch.AnalysisMode;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.batch.fs.FileSystem;
@@ -31,10 +38,12 @@ import org.sonar.api.batch.fs.InputPath;
 import org.sonar.api.batch.rule.ActiveRules;
 import org.sonar.api.batch.sensor.coverage.NewCoverage;
 import org.sonar.api.batch.sensor.cpd.NewCpdTokens;
+import org.sonar.api.batch.sensor.error.NewAnalysisError;
 import org.sonar.api.batch.sensor.highlighting.NewHighlighting;
 import org.sonar.api.batch.sensor.issue.NewIssue;
 import org.sonar.api.batch.sensor.measure.NewMeasure;
 import org.sonar.api.batch.sensor.symbol.NewSymbolTable;
+import org.sonar.api.config.Configuration;
 import org.sonar.api.config.Settings;
 import org.sonar.api.design.Dependency;
 import org.sonar.api.measures.Measure;
@@ -42,12 +51,6 @@ import org.sonar.api.measures.MeasuresFilter;
 import org.sonar.api.measures.Metric;
 import org.sonar.api.resources.Resource;
 import org.sonar.api.utils.Version;
-
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Debug class used in DelphiSensorTest. It proviedes some overriden functions,
@@ -61,13 +64,13 @@ public class DebugSensorContext implements SensorContext {
   private Map<String, String> sdata = new HashMap<String, String>();
   /**
    * Gets the violation by its index
-   * 
+   *
    * @return violation
    */
 
   /**
    * Gets violation count
-   * 
+   *
    * @return Violation count
    */
 
@@ -102,7 +105,7 @@ public class DebugSensorContext implements SensorContext {
 
   /**
    * Get measure keys
-   * 
+   *
    * @return Keys
    */
   public Set<String> getMeasuresKeys() {
@@ -187,46 +190,46 @@ public class DebugSensorContext implements SensorContext {
    * Unused, not implemented
    */
 
-  @Override
-  public void saveSource(Resource resource, String source) {
-
-  }
-
-  /**
-   * Unused, not implemented
-   */
-
-  @Override
-  public boolean index(Resource resource) {
-    return false;
-  }
+//  @Override
+//  public void saveSource(Resource resource, String source) {
+//
+//  }
 
   /**
    * Unused, not implemented
    */
 
-  @Override
-  public boolean index(Resource resource, Resource parentReference) {
-    return false;
-  }
+//  @Override
+//  public boolean index(Resource resource) {
+//    return false;
+//  }
 
   /**
    * Unused, not implemented
    */
 
-  @Override
-  public boolean isExcluded(Resource reference) {
-    return false;
-  }
+//  @Override
+//  public boolean index(Resource resource, Resource parentReference) {
+//    return false;
+//  }
 
   /**
    * Unused, not implemented
    */
 
-  @Override
-  public boolean isIndexed(Resource reference, boolean acceptExcluded) {
-    return false;
-  }
+//  @Override
+//  public boolean isExcluded(Resource reference) {
+//    return false;
+//  }
+
+  /**
+   * Unused, not implemented
+   */
+
+//  @Override
+//  public boolean isIndexed(Resource reference, boolean acceptExcluded) {
+//    return false;
+//  }
 
   /**
    * Unused, not implemented
@@ -287,7 +290,12 @@ public class DebugSensorContext implements SensorContext {
     return null;
   }
 
-  @Override
+    @Override
+    public Configuration config() {
+        return null;
+    }
+
+    @Override
   public FileSystem fileSystem() {
     return null;
   }
@@ -313,7 +321,17 @@ public class DebugSensorContext implements SensorContext {
     return null;
   }
 
-  /**
+    @Override
+    public SonarRuntime runtime() {
+        return null;
+    }
+
+    @Override
+    public boolean isCancelled() {
+        return false;
+    }
+
+    /**
    * Get analysis mode.
    */
 
@@ -367,5 +385,20 @@ public class DebugSensorContext implements SensorContext {
   public NewCpdTokens newCpdTokens() {
     return null;
   }
+
+    @Override
+    public NewAnalysisError newAnalysisError() {
+        return null;
+    }
+
+    @Override
+    public void addContextProperty(String key, String value) {
+
+    }
+
+    @Override
+    public void markForPublishing(InputFile inputFile) {
+
+    }
 
 }

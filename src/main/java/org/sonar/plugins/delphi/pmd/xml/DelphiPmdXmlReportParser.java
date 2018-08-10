@@ -22,10 +22,14 @@
  */
 package org.sonar.plugins.delphi.pmd.xml;
 
+import java.io.File;
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.staxmate.in.SMHierarchicCursor;
 import org.codehaus.staxmate.in.SMInputCursor;
 import org.sonar.api.batch.fs.InputFile;
+import org.sonar.api.batch.sensor.issue.NewIssueLocation;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.issue.Issuable;
 import org.sonar.api.rule.RuleKey;
@@ -34,75 +38,79 @@ import org.sonar.plugins.delphi.core.helpers.DelphiProjectHelper;
 import org.sonar.plugins.delphi.pmd.DelphiPmdConstants;
 import org.sonar.plugins.delphi.utils.DelphiUtils;
 
-import javax.xml.stream.XMLStreamException;
-import java.io.File;
-
 /**
  * Parses PMD xml report
  */
 public class DelphiPmdXmlReportParser {
 
-  private final DelphiProjectHelper delphiProjectHelper;
-  private final ResourcePerspectives perspectives;
+    private final DelphiProjectHelper delphiProjectHelper;
+    private final ResourcePerspectives perspectives;
 
-  public DelphiPmdXmlReportParser(DelphiProjectHelper delphiProjectHelper, ResourcePerspectives perspectives) {
-    this.delphiProjectHelper = delphiProjectHelper;
-    this.perspectives = perspectives;
-  }
+    public DelphiPmdXmlReportParser(DelphiProjectHelper delphiProjectHelper, ResourcePerspectives perspectives) {
+        this.delphiProjectHelper = delphiProjectHelper;
+        this.perspectives = perspectives;
+    }
 
-  /**
-   * Parses XML file
-   * 
-   * @param xmlFile PMD xml file
-   */
-  public void parse(File xmlFile) {
-    StaxParser parser = new StaxParser(new StaxParser.XmlStreamHandler() {
+    /**
+     * Parses XML file
+     *
+     * @param xmlFile PMD xml file
+     */
+    public void parse(File xmlFile) {
+        StaxParser parser = new StaxParser(new StaxParser.XmlStreamHandler() {
 
-      @Override
-      public void stream(SMHierarchicCursor rootCursor) throws XMLStreamException {
-        rootCursor.advance();
+            @Override
+            public void stream(SMHierarchicCursor rootCursor) throws XMLStreamException {
+                rootCursor.advance();
 
-        SMInputCursor fileCursor = rootCursor.descendantElementCursor("file");
-        while (fileCursor.getNext() != null) {
-          String fileName = fileCursor.getAttrValue("name");
+                SMInputCursor fileCursor = rootCursor.descendantElementCursor("file");
+                while (fileCursor.getNext() != null) {
+                    String fileName = fileCursor.getAttrValue("name");
 
-          SMInputCursor violationCursor = fileCursor.descendantElementCursor("violation");
-          while (violationCursor.getNext() != null) {
-            String beginLine = violationCursor.getAttrValue("beginline");
-            //String endLine = violationCursor.getAttrValue("beginline");
-            String ruleKey = violationCursor.getAttrValue("rule");
-            String message = StringUtils.trim(violationCursor.collectDescendantText());
-            System.out.println("HIER parse1:"+ruleKey+message+beginLine);
-            addIssue(ruleKey, fileName, Integer.parseInt(beginLine), message);
-          }
+                    SMInputCursor violationCursor = fileCursor.descendantElementCursor("violation");
+                    while (violationCursor.getNext() != null) {
+                        String beginLine = violationCursor.getAttrValue("beginline");
+                        //String endLine = violationCursor.getAttrValue("beginline");
+                        String ruleKey = violationCursor.getAttrValue("rule");
+                        String message = StringUtils.trim(violationCursor.collectDescendantText());
+                        System.out.println("HIER parse1:" + ruleKey + message + beginLine);
+                        addIssue(ruleKey, fileName, Integer.parseInt(beginLine), message);
+                    }
+                }
+            }
+        });
+
+        try {
+            parser.parse(xmlFile);
+        } catch (XMLStreamException e) {
+            DelphiUtils.LOG.error("Error parsing file : {}", xmlFile);
         }
-      }
-    });
-
-    try {
-      parser.parse(xmlFile);
-    } catch (XMLStreamException e) {
-      DelphiUtils.LOG.error("Error parsing file : {}", xmlFile);
-    }
-  }
-
-  private void addIssue(String ruleKey, String fileName, Integer beginLine, String message) {
-
-    DelphiUtils.LOG.debug("PMD Violation - rule: " + ruleKey + " file: " + fileName + " message: " + message);
-
-    InputFile inputFile = delphiProjectHelper.getFile(fileName);
-    Issuable issuable = perspectives.as(Issuable.class, inputFile);
-    if (issuable != null) {
-                //note this has been added to get compatibility with sonar 5.2
-        issuable.addIssue(
-                issuable.newIssueBuilder()
-                        .ruleKey(RuleKey.of(DelphiPmdConstants.REPOSITORY_KEY, ruleKey))
-                        .effortToFix(0.0)
-                        .message(message)
-                        .build()
-        );
-        //System.out.println("ISSUE TOSTRING: "+issue.toString());
     }
 
-  }
+    private void addIssue(String ruleKey, String fileName, Integer beginLine, String message) {
+
+        DelphiUtils.LOG.debug("PMD Violation - rule: " + ruleKey + " file: " + fileName + " message: " + message);
+
+        InputFile inputFile = delphiProjectHelper.getFile(fileName);
+        if (inputFile == null)
+            DelphiUtils.LOG.warn("File not found: " + fileName);
+
+        Issuable issuable = perspectives.as(Issuable.class, inputFile);
+        if (issuable != null && inputFile != null) {
+            //note this has been added to get compatibility with sonar 5.2
+            Issuable.IssueBuilder ibuild = issuable.newIssueBuilder();
+            NewIssueLocation loc = ibuild.newLocation()
+                    .on(inputFile)
+                    .at(inputFile.selectLine(beginLine))
+                    .message(message);
+            issuable.addIssue(ibuild
+                            .ruleKey(RuleKey.of(DelphiPmdConstants.REPOSITORY_KEY, ruleKey))
+                            .at(loc)
+                            .effortToFix(0.0)
+                            .build()
+            );
+            //System.out.println("ISSUE TOSTRING: "+issue.toString());
+        }
+
+    }
 }

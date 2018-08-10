@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import static org.hamcrest.Matchers.*;
 import static org.junit.Assert.assertThat;
-import static org.sonar.plugins.delphi.IssueMatchers.hasRuleKey;
+import static org.sonar.plugins.delphi.HasRuleKey.hasRuleKey;
 import static org.sonar.plugins.delphi.IssueMatchers.hasRuleLine;
 
 public class EmptyBeginStatementTest extends BasePmdRuleTest {
@@ -64,7 +64,7 @@ public class EmptyBeginStatementTest extends BasePmdRuleTest {
 
     assertThat(issues, is(empty()));
   }
-/*
+
 
   @Test
   public void testBeginEndStatement() {
@@ -105,6 +105,6 @@ public class EmptyBeginStatementTest extends BasePmdRuleTest {
     assertThat(toString(issues), issues, hasItem(allOf(hasRuleKey("EmptyBeginStatementRule"), hasRuleLine(builder.getOffSet() + 11))));
     assertThat(toString(issues), issues, hasItem(allOf(hasRuleKey("EmptyBeginStatementRule"), hasRuleLine(builder.getOffSet() + 14))));
   }
-*/
+
 
 }

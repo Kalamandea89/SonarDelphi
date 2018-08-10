@@ -22,19 +22,18 @@
  */
 package org.sonar.plugins.delphi.codecoverage.delphicodecoveragetool;
 
+import javax.xml.stream.XMLStreamException;
+
 import org.codehaus.staxmate.in.SMHierarchicCursor;
 import org.codehaus.staxmate.in.SMInputCursor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.measures.CoreMetrics;
 import org.sonar.api.measures.Measure;
-import org.sonar.api.measures.PersistenceMode;
 import org.sonar.api.utils.StaxParser.XmlStreamHandler;
 import org.sonar.plugins.delphi.codecoverage.CoverageFileData;
 import org.sonar.plugins.delphi.core.helpers.DelphiProjectHelper;
 import org.sonar.plugins.delphi.utils.DelphiUtils;
-
-import javax.xml.stream.XMLStreamException;
 
 public class DelphiCoverageToolParserStreamHandler implements XmlStreamHandler
 {
@@ -65,13 +64,13 @@ public class DelphiCoverageToolParserStreamHandler implements XmlStreamHandler
     Measure<Double> lineCoverage = new Measure<Double>(CoreMetrics.LINE_COVERAGE, data.getCoverage());
     Measure<Double> linesToCover = new Measure<Double>(CoreMetrics.LINES_TO_COVER, data.getTotalLines());
     Measure<Double> uncoveredLines = new Measure<Double>(CoreMetrics.UNCOVERED_LINES, data.getUncoveredLines());
-    Measure<?> lineHits = data.getLineHitsBuilder().build().setPersistenceMode(PersistenceMode.DATABASE);
+    //!!!Measure<?> lineHits = data.getLineHitsBuilder().build().setPersistenceMode(PersistenceMode.DATABASE);
     try {
       context.saveMeasure(data.getResource(), overallCoverage);
       context.saveMeasure(data.getResource(), lineCoverage);
       context.saveMeasure(data.getResource(), linesToCover);
       context.saveMeasure(data.getResource(), uncoveredLines);
-      context.saveMeasure(data.getResource(), lineHits);
+      //!!!context.saveMeasure(data.getResource(), lineHits);
       DelphiUtils.LOG.debug("Saving coverage to: " + data.getResource().absolutePath());
     } catch (Exception e) {
       DelphiUtils.LOG.error("Error saving coverage measure.", e);

@@ -19,15 +19,15 @@
  */
 package org.sonar.plugins.delphi.pmd;
 
-import org.sonar.api.issue.Issue;
-import org.sonar.api.issue.IssueComment;
-import org.sonar.api.rule.RuleKey;
-import org.sonar.api.utils.Duration;
-
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+
+import org.sonar.api.issue.Issue;
+import org.sonar.api.issue.IssueComment;
+import org.sonar.api.rule.RuleKey;
+import org.sonar.api.utils.Duration;
 
 public class DelphiIssue implements Issue{
 
@@ -74,7 +74,7 @@ public class DelphiIssue implements Issue{
 
     @Override
     public RuleKey ruleKey() {
-        return null;
+        return ruleKey;
     }
 
     @Override
@@ -94,7 +94,7 @@ public class DelphiIssue implements Issue{
 
     @Override
     public Integer line() {
-        return null;
+        return line;
     }
 
     @Override
@@ -180,6 +180,11 @@ public class DelphiIssue implements Issue{
 
     @Override
     public boolean isNew() {
+        return false;
+    }
+
+    @Override
+    public boolean isCopied() {
         return false;
     }
 

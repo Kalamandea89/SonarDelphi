@@ -22,18 +22,20 @@
  */
 package org.sonar.plugins.delphi.pmd;
 
+import javax.annotation.Nullable;
+
 import org.sonar.api.batch.sensor.issue.NewIssueLocation;
+import org.sonar.api.batch.sensor.issue.internal.DefaultIssueLocation;
 import org.sonar.api.issue.Issuable.IssueBuilder;
 import org.sonar.api.issue.Issue;
 import org.sonar.api.rule.RuleKey;
-
-import javax.annotation.Nullable;
 
 public class StubIssueBuilder implements IssueBuilder {
 
   private RuleKey ruleKey;
   private Integer line;
   private String message;
+  NewIssueLocation loc;
 
   @Override
   public IssueBuilder ruleKey(RuleKey ruleKey) {
@@ -43,7 +45,7 @@ public class StubIssueBuilder implements IssueBuilder {
 
   @Override
   public IssueBuilder line(@Nullable Integer integer) {
-    return null;
+    this.line = integer; return this;
   }
 
   @Override
@@ -53,12 +55,12 @@ public class StubIssueBuilder implements IssueBuilder {
 
   @Override
   public NewIssueLocation newLocation() {
-    return null;
+    return new DefaultIssueLocation();
   }
 
   @Override
   public IssueBuilder at(NewIssueLocation newIssueLocation) {
-    return null;
+    loc = newIssueLocation; return this;
   }
 
   @Override
@@ -94,7 +96,8 @@ public class StubIssueBuilder implements IssueBuilder {
   @Override
   public Issue build() {
     //DefaultIssue defaultIssue = new DefaultIssue().forRule(ruleKey);
-    return new DelphiIssue(line, ruleKey, message)
+
+    return new DelphiIssue(((DefaultIssueLocation)loc).textRange().start().line(), ruleKey, null)
             .getIssue();
     }//(Issue)defaultIssue;
 }

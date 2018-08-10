@@ -22,15 +22,20 @@
  */
 package org.sonar.plugins.delphi.metrics;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.batch.fs.InputFile;
 import org.sonar.api.batch.rule.ActiveRule;
 import org.sonar.api.batch.rule.ActiveRules;
+import org.sonar.api.batch.sensor.issue.NewIssueLocation;
+import org.sonar.api.batch.sensor.issue.internal.DefaultIssueLocation;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.issue.Issuable;
 import org.sonar.api.issue.Issue;
 import org.sonar.api.measures.CoreMetrics;
-import org.sonar.api.measures.PersistenceMode;
 import org.sonar.api.measures.RangeDistributionBuilder;
 import org.sonar.api.rule.RuleKey;
 import org.sonar.plugins.delphi.antlr.DelphiParser;
@@ -39,10 +44,6 @@ import org.sonar.plugins.delphi.core.language.FunctionInterface;
 import org.sonar.plugins.delphi.core.language.UnitInterface;
 import org.sonar.plugins.delphi.pmd.DelphiPmdConstants;
 import org.sonar.plugins.delphi.utils.DelphiUtils;
-
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Class counting function cyclomatic complexity.
@@ -99,16 +100,19 @@ public class ComplexityMetrics extends DefaultMetrics implements MetricsInterfac
   private double publicApi = 0;
 
   private ResourcePerspectives perspectives;
-  private Integer threshold;
+  private Integer threshold = -1;
 
   /**
    * {@inheritDoc}
    */
   public ComplexityMetrics(ActiveRules activeRules, ResourcePerspectives perspectives) {
-    super();
-    this.perspectives = perspectives;
-    methodCyclomaticComplexityRule = activeRules.find(RULE_KEY_METHOD_CYCLOMATIC_COMPLEXITY);
-    threshold = Integer.valueOf(methodCyclomaticComplexityRule.param("Threshold"));
+      super();
+      this.perspectives = perspectives;
+      if (activeRules != null) {
+          methodCyclomaticComplexityRule = activeRules.find(RULE_KEY_METHOD_CYCLOMATIC_COMPLEXITY);
+          if (methodCyclomaticComplexityRule != null && methodCyclomaticComplexityRule.param("Threshold") != null)
+              threshold = Integer.valueOf(methodCyclomaticComplexityRule.param("Threshold"));
+      }
 
   }
 
@@ -211,21 +215,21 @@ public class ComplexityMetrics extends DefaultMetrics implements MetricsInterfac
       // The Cyclomatic Complexity Number
       sensorContext.saveMeasure(resource, CoreMetrics.COMPLEXITY, getMetric("COMPLEXITY"));
       // Average complexity by class
-      sensorContext.saveMeasure(resource, CoreMetrics.CLASS_COMPLEXITY, getMetric("CLASS_COMPLEXITY"));
+      //!!!sensorContext.saveMeasure(resource, CoreMetrics.CLASS_COMPLEXITY, getMetric("CLASS_COMPLEXITY"));
 
       // Average cyclomatic complexity number by method
-      sensorContext.saveMeasure(resource, CoreMetrics.FUNCTION_COMPLEXITY, getMetric("FUNCTION_COMPLEXITY"));
+      //!!!sensorContext.saveMeasure(resource, CoreMetrics.FUNCTION_COMPLEXITY, getMetric("FUNCTION_COMPLEXITY"));
 
       // Number of classes including nested classes, interfaces, enums and annotations
       sensorContext.saveMeasure(resource, CoreMetrics.CLASSES, getMetric("CLASSES"));
       // Number of Methods without including accessors. A constructor is considered to be a method.
       sensorContext.saveMeasure(resource, CoreMetrics.FUNCTIONS, getMetric("FUNCTIONS"));
       // Number of getter and setter methods used to get(reading) or set(writing) a class' property .
-      sensorContext.saveMeasure(resource, CoreMetrics.ACCESSORS, getMetric("ACCESSORS"));
+      //!!!sensorContext.saveMeasure(resource, CoreMetrics.ACCESSORS, getMetric("ACCESSORS"));
       // Number of public classes, public methods (without accessors) and public properties (without public static final ones)
       sensorContext.saveMeasure(resource, CoreMetrics.PUBLIC_API, getMetric("PUBLIC_API"));
-      sensorContext.saveMeasure(resource, functionDist.build().setPersistenceMode(PersistenceMode.MEMORY));
-      sensorContext.saveMeasure(resource, fileDist.build().setPersistenceMode(PersistenceMode.MEMORY));
+      //!!!sensorContext.saveMeasure(resource, functionDist.build().setPersistenceMode(PersistenceMode.MEMORY));
+      //!!!sensorContext.saveMeasure(resource, fileDist.build().setPersistenceMode(PersistenceMode.MEMORY));
     } catch (IllegalStateException ise) {
       DelphiUtils.LOG.error(ise.getMessage());
     }
@@ -265,18 +269,28 @@ public class ComplexityMetrics extends DefaultMetrics implements MetricsInterfac
     return DelphiUtils.acceptFile(resource.absolutePath());
   }
 
-  private void addIssue(InputFile resource, FunctionInterface func) {
-    if (func.getComplexity() > threshold.intValue()) {
-      Issuable issuable = perspectives.as(Issuable.class, resource);
-      if (issuable != null) {
-        Issue issue = issuable.newIssueBuilder()
-          .ruleKey(methodCyclomaticComplexityRule.ruleKey())
-          .line(func.getBodyLine())
-          .message(String.format("The Cyclomatic Complexity of this method \"%s\" is %d which is greater than %d authorized.",
-            func.getRealName(), func.getComplexity(), threshold))
-          .build();
-        issuable.addIssue(issue);
-      }
+    private void addIssue(InputFile resource, FunctionInterface func) {
+        if ((threshold > -1) && func.getComplexity() > threshold.intValue()) {
+            Issuable issuable = perspectives.as(Issuable.class, resource);
+
+            DelphiUtils.LOG.debug("complexity.info " + resource.filename() + " lines total: " + resource.lines() +
+                    "funcLongName: " + func.getLongName() + " funct.getbodyline: " + func.getBodyLine());
+            // при анализе УРМ валится что номер строки функции больше чем общее число строк в файле
+            // причём запуск на чисто allowance отрабатывает успешно.
+            // TODO как-нибудь раобраться и поправить. А пока эта цикломатическая сложность не особо нужна
+            int minLine = resource.lines() < func.getBodyLine() ? resource.lines() : func.getBodyLine();
+            if (issuable != null) {
+                NewIssueLocation loc = new DefaultIssueLocation()
+                        .on(resource)
+                        .at(resource.selectLine(minLine))
+                        .message(String.format("The Cyclomatic Complexity of this method \"%s\" is %d which is greater than %d authorized.",
+                                func.getRealName(), func.getComplexity(), threshold));
+                Issue issue = issuable.newIssueBuilder()
+                        .ruleKey(methodCyclomaticComplexityRule.ruleKey())
+                        .at(loc)
+                        .build();
+                issuable.addIssue(issue);
+            }
+        }
     }
-  }
 }

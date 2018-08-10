@@ -22,13 +22,22 @@
  */
 package org.sonar.plugins.delphi.pmd;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.mockito.Matchers;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
+import org.sonar.api.batch.bootstrap.ProjectDefinition;
 import org.sonar.api.batch.fs.InputFile;
-import org.sonar.api.batch.fs.internal.DefaultInputFile;
+import org.sonar.api.batch.fs.internal.TestInputFileBuilder;
 import org.sonar.api.component.ResourcePerspectives;
 import org.sonar.api.issue.Issuable;
 import org.sonar.api.issue.Issue;
@@ -41,13 +50,6 @@ import org.sonar.plugins.delphi.pmd.profile.DelphiPmdProfileExporter;
 import org.sonar.plugins.delphi.project.DelphiProject;
 import org.sonar.plugins.delphi.utils.DelphiUtils;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
@@ -57,15 +59,19 @@ import static org.mockito.Mockito.when;
 
 public abstract class BasePmdRuleTest {
 
-  protected static final String ROOT_DIR_NAME = "/org/sonar/plugins/delphi/PMDTest";
-  protected static final File ROOT_DIR = DelphiUtils.getResource(ROOT_DIR_NAME);
+  //protected static final String ROOT_DIR_NAME = "/org/sonar/plugins/delphi/PMDTest";
+
+  protected static final String ROOT_DIR_NAME = "D:\\sources\\SonarDelphiPlugin\\target\\test-classes\\org\\sonar\\plugins\\delphi\\PMDTest";
+  //protected static final File ROOT_DIR = DelphiUtils.getResource("/org/sonar/plugins/delphi/PMDTest");
+  protected static final File ROOT_DIR = new File("D:\\sources\\SonarDelphiPlugin\\target\\test-classes\\org\\sonar\\plugins\\delphi\\PMDTest");
 
   private ResourcePerspectives perspectives;
   private DelphiProjectHelper delphiProjectHelper;
   private Issuable issuable;
 
   protected DelphiPmdSensor sensor;
-  protected Project project=new Project("porjectstring","projectbranch","projectname");
+  //protected Project project=new Project("porjectstring", "projectbranch", "projectname");
+  protected Project project = new Project(ProjectDefinition.create());
   protected List<Issue> issues = new LinkedList<Issue>();
   private File testFile;
   private DelphiPmdProfileExporter profileExporter;
@@ -75,22 +81,88 @@ public abstract class BasePmdRuleTest {
     configureTest(builder);
 
     DebugSensorContext sensorContext = new DebugSensorContext();
-    //sensor.analyse(project, sensorContext);
-    //todo: REACTIVATE THIS TEST, ATM PROBLEMS WITHTREE TESTLOGIC
-    //assertThat("Errors: " + sensor.getErrors(), sensor.getErrors(), is(empty()));
+    sensor.analyse(project, sensorContext);
+
+    assertThat("Errors: " + sensor.getErrors(), sensor.getErrors(), is(empty()));
 
   }
 
   private void configureTest(DelphiUnitBuilderTest builder) {
     testFile = builder.buildFile(ROOT_DIR);
 
-    String relativePathTestFile = DelphiUtils.getRelativePath(testFile, Arrays.asList(ROOT_DIR));
+    //String relativePathTestFile = DelphiUtils.getRelativePath(testFile, Arrays.asList(ROOT_DIR));
 
-    configureTest(ROOT_DIR_NAME + "/" + relativePathTestFile);
+    //configureTest(ROOT_DIR_NAME + "/" + relativePathTestFile);
+      //configureTest(testFile.getPath());
+
+      perspectives = mock(ResourcePerspectives.class);
+      delphiProjectHelper = DelphiTestUtils.mockProjectHelper();
+
+      // Don't pollute current working directory
+      when(delphiProjectHelper.workDir()).thenReturn(new File("target"));
+
+      //File srcFile = DelphiUtils.getResource(testFileName);
+      File srcFile = testFile;
+
+      //InputFile inputFile = new DefaultInputFile("ROOT_KEY_CHANGE_AT_SONARAPI_5", srcFile.getPath()).setModuleBaseDir(Paths.get(ROOT_DIR_NAME));
+      System.out.println(srcFile.getPath());
+      InputFile inputFile = TestInputFileBuilder.create("ROOT_KEY_CHANGE_AT_SONARAPI_5", new File(ROOT_DIR_NAME), srcFile).build();
+
+      DelphiProject delphiProject = new DelphiProject("Default Project");
+      delphiProject.setSourceFiles(Arrays.asList(inputFile));
+
+      issuable = mock(Issuable.class);
+
+      when(delphiProjectHelper.getWorkgroupProjects()).thenReturn(Arrays.asList(delphiProject));
+      when(delphiProjectHelper.getFile(anyString())).thenAnswer(new Answer<InputFile>() {
+          @Override
+          public InputFile answer(InvocationOnMock invocation) throws Throwable {
+              //InputFile inputFile = new DefaultInputFile("ROOT_KEY_CHANGE_AT_SONARAPI_5", (new File((String) invocation
+              //      .getArguments()[0])).getPath()).setModuleBaseDir(Paths.get(ROOT_DIR_NAME));
+              File file = new File((String) invocation.getArguments()[0]);
+              InputFile inputFile = TestInputFileBuilder.create("ROOT_KEY_CHANGE_AT_SONARAPI_5",
+                      file.getPath()).setModuleBaseDir(Paths.get(ROOT_DIR_NAME))
+                      .setContents(FileUtils.readFileToString(file, Charset.defaultCharset().name())).build();
+              // else exception what lines -1
+
+              when(perspectives.as(Issuable.class, inputFile)).thenReturn(issuable);
+
+              when(issuable.newIssueBuilder()).thenReturn(new StubIssueBuilder());
+
+              return inputFile;
+          }
+      });
+
+      when(issuable.addIssue(Matchers.any(Issue.class))).then(new Answer<Boolean>() {
+          @Override
+          public Boolean answer(InvocationOnMock invocation) throws Throwable {
+              System.out.println("HIER:"+ invocation.getArguments()[0]);
+              System.out.println("HIER2:"+invocation.getArguments()[0]);
+              Issue issue = (Issue) invocation.getArguments()[0];
+              issues.add(issue);
+              return Boolean.TRUE;
+          }
+      });
+      rulesProfile = mock(RulesProfile.class);
+      profileExporter = mock(DelphiPmdProfileExporter.class);
+
+      String fileName = getClass().getResource("/org/sonar/plugins/delphi/pmd/rules.xml").getPath();
+      File rulesFile = new File(fileName);
+      String rulesXmlContent;
+      try {
+          rulesXmlContent = FileUtils.readFileToString(rulesFile);
+      } catch (IOException e) {
+          throw new RuntimeException(e);
+      }
+
+      when(profileExporter.exportProfileToString(rulesProfile)).thenReturn(rulesXmlContent);
+
+      sensor = new DelphiPmdSensor(delphiProjectHelper, perspectives, rulesProfile, profileExporter);
+
   }
 
   protected void configureTest(String testFileName) {
-    project = mock(Project.class);
+    //project = mock(Project.class);
     perspectives = mock(ResourcePerspectives.class);
     delphiProjectHelper = DelphiTestUtils.mockProjectHelper();
 
@@ -99,7 +171,9 @@ public abstract class BasePmdRuleTest {
 
     File srcFile = DelphiUtils.getResource(testFileName);
 
-    InputFile inputFile = new DefaultInputFile("ROOT_KEY_CHANGE_AT_SONARAPI_5",srcFile.getPath()).setModuleBaseDir(Paths.get(ROOT_DIR_NAME));
+    //InputFile inputFile = new DefaultInputFile("ROOT_KEY_CHANGE_AT_SONARAPI_5", srcFile.getPath()).setModuleBaseDir(Paths.get(ROOT_DIR_NAME));
+      System.out.println(srcFile.getPath());
+    InputFile inputFile = TestInputFileBuilder.create("ROOT_KEY_CHANGE_AT_SONARAPI_5", new File(ROOT_DIR_NAME), srcFile).build();
 
     DelphiProject delphiProject = new DelphiProject("Default Project");
     delphiProject.setSourceFiles(Arrays.asList(inputFile));
@@ -110,9 +184,10 @@ public abstract class BasePmdRuleTest {
     when(delphiProjectHelper.getFile(anyString())).thenAnswer(new Answer<InputFile>() {
       @Override
       public InputFile answer(InvocationOnMock invocation) throws Throwable {
-        InputFile inputFile = new DefaultInputFile("ROOT_KEY_CHANGE_AT_SONARAPI_5",(new File((String) invocation
-                .getArguments()[0])).getPath()).setModuleBaseDir(Paths.get(ROOT_DIR_NAME));
-
+        //InputFile inputFile = new DefaultInputFile("ROOT_KEY_CHANGE_AT_SONARAPI_5", (new File((String) invocation
+          //      .getArguments()[0])).getPath()).setModuleBaseDir(Paths.get(ROOT_DIR_NAME));
+        File file = new File((String) invocation.getArguments()[0]);
+        InputFile inputFile = TestInputFileBuilder.create("ROOT_KEY_CHANGE_AT_SONARAPI_5", file.getPath()).setModuleBaseDir(Paths.get(ROOT_DIR_NAME)).build();
         when(perspectives.as(Issuable.class, inputFile)).thenReturn(issuable);
 
         when(issuable.newIssueBuilder()).thenReturn(new StubIssueBuilder());

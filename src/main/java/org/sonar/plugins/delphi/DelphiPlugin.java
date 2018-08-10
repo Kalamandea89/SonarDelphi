@@ -22,10 +22,12 @@
  */
 package org.sonar.plugins.delphi;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.sonar.api.Properties;
 import org.sonar.api.Property;
 import org.sonar.api.SonarPlugin;
-import org.sonar.plugins.delphi.colorizer.DelphiColorizerFormat;
 import org.sonar.plugins.delphi.core.DelphiLanguage;
 import org.sonar.plugins.delphi.core.helpers.DelphiProjectHelper;
 import org.sonar.plugins.delphi.cpd.DelphiCpdMapping;
@@ -35,9 +37,6 @@ import org.sonar.plugins.delphi.pmd.profile.DelphiPmdProfileExporter;
 import org.sonar.plugins.delphi.pmd.profile.DelphiPmdProfileImporter;
 import org.sonar.plugins.delphi.pmd.profile.DelphiPmdRuleDefinition;
 import org.sonar.plugins.delphi.surefire.SurefireSensor;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Main Sonar DelphiLanguage plugin class
@@ -96,7 +95,7 @@ public class DelphiPlugin extends SonarPlugin {
     // Core helpers
     list.add(DelphiProjectHelper.class);
     // Colorizer
-    list.add(DelphiColorizerFormat.class);
+    //!!!list.add(DelphiColorizerFormat.class);
     // Surefire
     list.add(SurefireSensor.class);
     // Pmd

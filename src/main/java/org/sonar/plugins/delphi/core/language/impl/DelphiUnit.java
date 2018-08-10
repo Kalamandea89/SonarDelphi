@@ -70,7 +70,10 @@ public class DelphiUnit implements UnitInterface {
 
   @Override
   public String getFileName() {
-    return file.getName();
+    if (file != null)
+      return file.getName();
+    else
+      return name;    
   }
 
   /**
@@ -96,7 +99,6 @@ public class DelphiUnit implements UnitInterface {
   @Override
   public void setPath(String path) {
     file = new File(path);
-
   }
 
   /**
@@ -105,7 +107,10 @@ public class DelphiUnit implements UnitInterface {
 
   @Override
   public String getPath() {
-    return file.getAbsolutePath();
+    if (file != null)
+      return file.getAbsolutePath();
+    else
+      return name;    
   }
 
   /**

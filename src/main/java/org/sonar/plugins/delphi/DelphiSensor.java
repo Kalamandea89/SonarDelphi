@@ -22,6 +22,9 @@
  */
 package org.sonar.plugins.delphi;
 
+import java.io.File;
+import java.util.*;
+
 import org.sonar.api.batch.Sensor;
 import org.sonar.api.batch.SensorContext;
 import org.sonar.api.batch.fs.InputFile;
@@ -48,9 +51,6 @@ import org.sonar.plugins.delphi.project.DelphiProject;
 import org.sonar.plugins.delphi.utils.DelphiUtils;
 import org.sonar.plugins.delphi.utils.ProgressReporter;
 import org.sonar.plugins.delphi.utils.ProgressReporterLogger;
-
-import java.io.File;
-import java.util.*;
 
 /**
  * Main DelphiLanguage sensor class, it executes on DelphiLanguage project and
@@ -140,8 +140,7 @@ public class DelphiSensor implements Sensor {
 
   public void processMetric(MetricsInterface metric, SensorContext sensorContext, InputFile resource) {
     if (metric.executeOnResource(resource)) {
-      metric.analyse(resource, sensorContext, fileClasses.get(resource), fileFunctions.get(resource),
-        units);
+      metric.analyse(resource, sensorContext, fileClasses.get(resource), fileFunctions.get(resource), units);
       InputFile inputFile = delphiProjectHelper.getFile(resource.file().getAbsolutePath());
       metric.save(inputFile, sensorContext);
     }
@@ -212,19 +211,19 @@ public class DelphiSensor implements Sensor {
 
     InputFile resource = delphiProjectHelper.getFile(sourceFile);
 
-    Directory directory = delphiProjectHelper.getDirectory(sourceFile.getParentFile(), project);
+//    Directory directory = delphiProjectHelper.getDirectory(sourceFile.getParentFile(), project);
+//
+//    if (directory == null) {
+//      throw new IllegalArgumentException("Directory: " + sourceFile.getParentFile() + " not found.");
+//    }
+//
+//    packageList.add(directory);
 
-    if (directory == null) {
-      throw new IllegalArgumentException("Directory: " + sourceFile.getParentFile() + " not found.");
-    }
-
-    packageList.add(directory);
-
-    if (filesCount.containsKey(directory)) {
-      filesCount.put(directory, filesCount.get(directory) + 1);
-    } else {
-      filesCount.put(directory, Integer.valueOf(1));
-    }
+//    if (filesCount.containsKey(directory)) {
+//      filesCount.put(directory, filesCount.get(directory) + 1);
+//    } else {
+//      filesCount.put(directory, Integer.valueOf(1));
+//    }
     resourceList.add(resource);
 
     final CodeAnalysisResults results = analyseSourceFile(sourceFile, analyzer);

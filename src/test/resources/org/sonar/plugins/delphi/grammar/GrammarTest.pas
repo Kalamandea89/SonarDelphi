@@ -66,8 +66,14 @@ type
 	end;
 	
 	overloadClass = Class
-			procedure foo(x,y: integer);	overload					//; not needed at the end of overload to compile
-			procedure foo(z: real);			overload
+			procedure foo(x,y: integer);	overload;					//; not needed at the end of overload to compile //!!! for Delhpi5 need
+			procedure foo(z: real);			overload;
+			property QueryBuilder : IQueryBuilder<GenericRecord> read rr write ww;
+	end;
+
+
+	overloadClass = Class
+			procedure foo(x,y: integer)	overload;					//; not needed at the end of overload to compile //!!! for Delhpi5 for one method not need
 			property QueryBuilder : IQueryBuilder<GenericRecord> read rr write ww;
 	end;
 
