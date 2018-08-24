@@ -59,11 +59,8 @@ import static org.mockito.Mockito.when;
 
 public abstract class BasePmdRuleTest {
 
-  //protected static final String ROOT_DIR_NAME = "/org/sonar/plugins/delphi/PMDTest";
-
-  protected static final String ROOT_DIR_NAME = "D:\\sources\\SonarDelphiPlugin\\target\\test-classes\\org\\sonar\\plugins\\delphi\\PMDTest";
-  //protected static final File ROOT_DIR = DelphiUtils.getResource("/org/sonar/plugins/delphi/PMDTest");
-  protected static final File ROOT_DIR = new File("D:\\sources\\SonarDelphiPlugin\\target\\test-classes\\org\\sonar\\plugins\\delphi\\PMDTest");
+  protected static final String ROOT_DIR_NAME = Paths.get("target/test-classes/org/sonar/plugins/delphi/PMDTest").toAbsolutePath().toString();
+  protected static final File ROOT_DIR = new File(ROOT_DIR_NAME);
 
   private ResourcePerspectives perspectives;
   private DelphiProjectHelper delphiProjectHelper;

@@ -361,6 +361,19 @@ DoSomething;   //GOOD
  		]]></example>
 	</rule>
 
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.AssignSameValueRule" message="You don't must assign same rule"
+		  name="AssignSameValueRule">
+		<description> You don't must assign same rule
+		</description>
+		<example><![CDATA[
+if a then
+	a := true; // wrong
+
+ 		]]></example>
+	</rule>
+
+
+
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.ThenElseAssignBoolean" message="You don't must assign true else false"
 		  name="ThenElseAssignBoolean">
 		<description> Simple assign condition to variable.

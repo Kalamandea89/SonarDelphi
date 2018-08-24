@@ -70,13 +70,13 @@
 
 	<properties>
 		<!--Version Fields-->
-		<sonar.version>5.6.1</sonar.version>
+		<sonar.version>7.1</sonar.version>
 		<sonarcobertura.version>1.4</sonarcobertura.version>
 		<antlr-runtime.version>3.3</antlr-runtime.version>
 		<slf4j.version>1.7.5</slf4j.version>
-		<pmd.version>4.2.5</pmd.version>
+		<pmd.version>4.2.6</pmd.version>
 		<pmd.plugin.version>2.0</pmd.plugin.version>
-		<xalan.version>2.7.1</xalan.version>
+		<xalan.version>2.7.2</xalan.version>
 		<hamcrest-all.version>1.3</hamcrest-all.version>
 		<junit.version>4.12</junit.version>
 		<org.mockit.version>1.10.19</org.mockit.version>
@@ -98,12 +98,17 @@
 	<packaging>sonar-plugin</packaging>
 
 	<dependencies>
-
 		<!-- Sonar provided deps -->
 		<dependency>
 			<groupId>org.sonarsource.sonarqube</groupId>
 			<artifactId>sonar-plugin-api</artifactId>
 			<version>${sonar.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.codehaus.staxmate</groupId>
+			<artifactId>staxmate</artifactId>
+			<version>2.0.1</version>
 			<scope>provided</scope>
 		</dependency>
 		<!-- Plugin's specific deps -->
@@ -154,6 +159,7 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -170,6 +176,12 @@
 			<groupId>org.mockito</groupId>
 			<artifactId>mockito-core</artifactId>
 			<version>${org.mockit.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.fasterxml.woodstox</groupId>
+			<artifactId>woodstox-core</artifactId>
+			<version>5.0.2</version>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -271,8 +283,17 @@
 				<groupId>org.antlr</groupId>
 				<artifactId>antlr3-maven-plugin</artifactId>
 				<version>3.5.2</version>
+				<executions>
+					<execution>
+						<id>antlr</id>
+						<phase>generate-sources</phase>
+						<goals>
+							<goal>antlr</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
-			<plugin>
+			<!--plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-javadoc-plugin</artifactId>
 				<version>2.10.4</version>
@@ -287,7 +308,7 @@
 				<configuration>
 					<source>1.8</source>
 				</configuration>
-			</plugin>
+			</plugin-->
 			<plugin>
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>2.10</version>
@@ -303,5 +324,4 @@
 			</plugin>
 		</plugins>
 	</build>
-
 </project>
