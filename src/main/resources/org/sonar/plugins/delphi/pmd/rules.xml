@@ -310,8 +310,14 @@
 		<description>You should always use every passed function argument.</description>
 		<properties>
 			<property name="excluded_args">
-				<value>Sender,ASender,DataSet,ADataSet</value>
+				<!--исключить из анализа-->
+				<value>ASender,DataSet,ADataSet</value>
 			</property>
+			<property name="no_scan">
+				<!--no_scan=не анализировать метод есои есть аргумент-->
+				<value>Sender</value>
+			</property>
+			
 		</properties>
 	</rule>
 
@@ -361,9 +367,9 @@ DoSomething;   //GOOD
  		]]></example>
 	</rule>
 
-	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.AssignSameValueRule" message="You don't must assign same rule"
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.AssignSameValueRule" message="You don't must assign same value"
 		  name="AssignSameValueRule">
-		<description> You don't must assign same rule
+		<description> You don't must assign same value
 		</description>
 		<example><![CDATA[
 if a then
@@ -439,7 +445,7 @@ x := a or x := not a;   //GOOD
 		<description>You should not use type aliases.</description>
 		<properties>
 			<property name="xpath">
-				<value>//TkNewType/*[count(descendant::*) &lt; 3 and name(descendant::*) != 'class' and
+				<value>//TkNewType/*[count(descendant::*) &lt; 3 and name(descendant::*) != 'class' and name(descendant::*) != 'procedure' and
 					name(descendant::*) != 'TkRecord' and name(descendant::*) != 'array' and name(descendant::*) !=
 					'set' and name(descendant::*) != 'dash_pointer' and name(descendant::*) != 'TkClassOfType' and
 					name(descendant::*) != 'TkInterface' and name() != 'TkCustomAttribute']
@@ -521,6 +527,11 @@ x := a or x := not a;   //GOOD
 				<value>10</value>
 			</property>
 		</properties>
+	</rule>
+
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.TypeRealRule" message="Type real is out of date"
+		name="TypeRealRule">
+		<description>Need use type Double</description>
 	</rule>
 
 </ruleset>

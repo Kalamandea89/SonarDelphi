@@ -39,9 +39,11 @@ public class UnusedArgumentsRule extends DelphiRule {
   private static final int MAX_LOOK_AHEAD = 3;
 
   private static final PropertyDescriptor EXCLUDED_ARGS = new StringProperty("excluded_args",
-    "The argument names to ignore", new String[] {}, 1.0f, ',');
-
+          "The argument names to ignore", new String[]{}, 1.0f, ',');
+  private static final PropertyDescriptor NO_SCAN = new StringProperty("no_scan",
+          "The argument names to ignore", new String[]{}, 1.0f, ',');
   private final List<String> excludedArgs = new ArrayList<String>();
+  private final List<String> noScan = new ArrayList<String>();
 
   @Override
   public void visit(DelphiPMDNode node, RuleContext ctx) {
@@ -124,6 +126,11 @@ public class UnusedArgumentsRule extends DelphiRule {
    */
   private void checkForUnusedArguments(Map<String, Integer> args, RuleContext ctx, DelphiPMDNode node, String methodName) {
     for (Map.Entry<String, Integer> entry : args.entrySet()) {
+		if (ignoredScan(entry.getKey()))
+			return;
+	}
+
+        for (Map.Entry<String, Integer> entry : args.entrySet()) {
       if (entry.getValue() == 0 && !ignoredArg(entry.getKey())) {
         addViolation(ctx, node, "Unused argument: '" + entry.getKey() + "' at " + methodName);
       }
@@ -134,25 +141,29 @@ public class UnusedArgumentsRule extends DelphiRule {
     return excludedArgs.contains(arg);
   }
 
+  private boolean ignoredScan(String arg) {
+      return noScan.contains(arg);
+  }
+
   /**
    * Process begin node, to look for used arguments
-   * 
+   *
    * @param beginNode Begin node
-   * @param args Argument map
+   * @param args      Argument map
    */
   private void processFunctionBegin(Tree beginNode, Map<String, Integer> args) {
     for (int i = 0; i < beginNode.getChildCount(); ++i) {
-      Tree child = beginNode.getChild(i);
-      String key = child.getText().toLowerCase();
-      if (args.containsKey(key)) {
-        // if we are using a argument, increase the counter
-        Integer newValue = args.get(key) + 1;
-        args.put(key, newValue);
-      }
+        Tree child = beginNode.getChild(i);
+        String key = child.getText().toLowerCase();
+        if (args.containsKey(key)) {
+            // if we are using a argument, increase the counter
+            Integer newValue = args.get(key) + 1;
+            args.put(key, newValue);
+        }
 
-      if (child.getType() == DelphiLexer.BEGIN) {
-        processFunctionBegin(child, args);
-      }
+        if (child.getType() == DelphiLexer.BEGIN) {
+          processFunctionBegin(child, args);
+        }
     }
   }
 
@@ -187,6 +198,10 @@ public class UnusedArgumentsRule extends DelphiRule {
     String[] stringProperties = getStringProperties(EXCLUDED_ARGS);
     for (String prop : stringProperties) {
       excludedArgs.add(prop.toLowerCase());
+    }
+    stringProperties = getStringProperties(NO_SCAN);
+    for (String prop : stringProperties) {
+        noScan.add(prop.toLowerCase());
     }
   }
 }

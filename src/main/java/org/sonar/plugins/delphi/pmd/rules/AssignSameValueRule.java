@@ -39,6 +39,11 @@ public class AssignSameValueRule extends DelphiRule {
                 (node.parent.getChild(node.getChildIndex() + 2).getType() == DelphiLexer.TkIdentifier) &&
                 node.parent.getChild(node.getChildIndex() + 3).getType() == DelphiLexer.THEN ){
 
+            if (node.parent.getChild(node.getChildIndex() + 4).getText().equalsIgnoreCase((node.parent.getChild(node.getChildIndex() + 2).getText())) &&
+                    node.parent.getChild(node.getChildIndex() + 5).getType() == DelphiLexer.ASSIGN &&
+                    node.parent.getChild(node.getChildIndex() + 6).getType() == DelphiLexer.FALSE)
+                addViolation(ctx, node);
+
             // здесь проверка на вложеный begin/end;
             if (node.parent.getChild(node.getChildIndex() + 4).getType() == DelphiLexer.BEGIN) {
                 Tree begin2 = node.parent.getChild(node.getChildIndex() + 4);
@@ -50,14 +55,6 @@ public class AssignSameValueRule extends DelphiRule {
                         addViolation(ctx, node);
                 }
             }
-                // далей той же самой переменнной прпосто присвоили false
-            if (node.parent.getChild(node.getChildIndex() + 4).getText().equalsIgnoreCase((node.parent.getChild(node.getChildIndex() + 2).getText())) &&
-                node.parent.getChild(node.getChildIndex() + 5).getType() == DelphiLexer.ASSIGN &&
-                node.parent.getChild(node.getChildIndex() + 6).getType() == DelphiLexer.FALSE)
-                addViolation(ctx, node);
-
-               // или же где-то внутрри begin end сделали это.
-
 
         }
 

@@ -178,4 +178,18 @@ public class UnusedArgumentsRuleTest extends BasePmdRuleTest {
 
     assertThat(toString(issues), issues, hasSize(4));
   }
+
+  @Test
+  public void validRuleEventFunction() {
+      DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
+
+      builder.appendDecl("procedure TfPropView.VCLPropMouseDown(Sender: TObject;");
+      builder.appendDecl("  Button: TMouseButton; Shift: TShiftState; X, Y: Integer);");
+      builder.appendDecl("begin");
+      builder.appendDecl("i := 0;");
+      builder.appendDecl("end;");
+
+      analyse(builder);
+      assertThat(issues, is(empty()));
+  }
 }

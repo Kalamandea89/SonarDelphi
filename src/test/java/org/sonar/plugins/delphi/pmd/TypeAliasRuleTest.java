@@ -105,4 +105,15 @@ public class TypeAliasRuleTest extends BasePmdRuleTest {
     assertThat(issues, is(empty()));
   }
 
+  @Test
+  public void falsePositiveProcClassIsNotTypeAlias() {
+    DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
+
+    builder.appendDecl("type");
+    builder.appendDecl("  TMyClass = procedure;");
+
+    analyse(builder);
+
+    assertThat(issues, is(empty()));
+  }
 }

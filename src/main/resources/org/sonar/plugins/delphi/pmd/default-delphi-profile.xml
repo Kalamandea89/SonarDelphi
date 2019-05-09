@@ -7,11 +7,11 @@
 	<!-- PRIORITY: 1 - blocker, 2 - critical, 3 - major, 4 - minor, 5 - info -->
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.ThenTryRule" name="ThenTryRule">
-		<priority>3</priority>
+		<priority>4</priority>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.CountRule" name="OneClassPerFileRule">
-		<priority>3</priority>
+		<priority>4</priority>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.NodeSequenceRule" name="InheritedMethodWithNoCodeRule">
@@ -27,19 +27,19 @@
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.XPathRule" name="EmptyInterfaceRule">
-		<priority>2</priority>
+		<priority>4</priority>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.TooLongMethodRule" name="TooLongMethodRule">
-		<priority>3</priority>
+		<priority>4</priority>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.VariableCounter" name="TooManyArgumentsRule">
-		<priority>3</priority>
+		<priority>4</priority>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.VariableCounter" name="TooManyVariablesRule">
-		<priority>3</priority>
+		<priority>4</priority>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.XPathRule" name="NoSemiAfterOverloadRule">
@@ -79,11 +79,11 @@
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.NodeSequenceRule" name="CatchingGeneralExceptionRule">
-		<priority>3</priority>
+		<priority>4</priority>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.NodeSequenceRule" name="RaisingGeneralExceptionRule">
-		<priority>3</priority>
+		<priority>4</priority>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.XPathRule" name="AvoidOutParameterRule">
@@ -103,7 +103,7 @@
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.UnusedArgumentsRule" name="UnusedArgumentsRule">
-		<priority>3</priority>
+		<priority>4</priority>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.XPathRule" name="NoGuidRule">
@@ -119,11 +119,11 @@
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.XPathRule" name="EmptyBeginStatementRule">
-		<priority>2</priority>
+		<priority>4</priority>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.DprFunctionRule" name="ProjectFileNoFunctionsRule">
-		<priority>3</priority>
+		<priority>4</priority>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.DprVariableRule" name="ProjectFileNoVariablesRule">
@@ -163,7 +163,7 @@
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.WithAfterDoThenRule" name="WithAfterDoThenRule">
-		<priority>3</priority>
+		<priority>4</priority>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.NoSemicolonRule" name="NoSemicolonRule">
@@ -175,7 +175,11 @@
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.DelphiRule" name="MethodCyclomaticComplexityRule">
-		<priority>2</priority>
+		<priority>4</priority>
+	</rule>
+	
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.TypeRealRule" name="TypeRealRule">
+		<priority>1</priority>
 	</rule>
 
 </ruleset>
