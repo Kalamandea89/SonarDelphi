@@ -5,7 +5,7 @@
 
 
 	<artifactId>sonar-delphi-plugin</artifactId>
-	<version>0.3.4</version>
+	<version>1.0.0</version>
 	<groupId>org.delphi.plugin</groupId>
 	<name>Sonar Delphi Plugin</name>
 	<description>Enables analysis of Delphi projects.</description>
@@ -14,6 +14,14 @@
 	<url>http://docs.sonarqube.org/display/SONARQUBE45/Delphi+Plugin</url>
 
 	<developers>
+		<developer>
+			<id>mahalov</id>
+			<email>mahalov@krista.ru</email>
+			<name>Mahalog Yura</name>
+			<roles>
+				<role>developer</role>
+			</roles>
+		</developer>
 		<developer>
 			<id>sandroluck</id>
 			<email>sandro.luck@gmx.ch</email>
