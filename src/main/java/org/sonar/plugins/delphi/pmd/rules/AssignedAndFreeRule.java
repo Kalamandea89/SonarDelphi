@@ -36,8 +36,8 @@ import org.sonar.plugins.delphi.antlr.ast.DelphiPMDNode;
  */
 public class AssignedAndFreeRule extends DelphiRule {
 
-    protected boolean started;
-    protected Set<String> variables;
+    private boolean started;
+    private Set<String> variables = new HashSet<>();
 
     @Override
     public void visit(DelphiPMDNode node, RuleContext ctx) {
@@ -140,7 +140,7 @@ public class AssignedAndFreeRule extends DelphiRule {
     @Override
     protected void init() {
         started = false;
-        variables = new HashSet<String>();
+        variables.clear();
     }
 
 }

@@ -12,7 +12,7 @@ public class InheritedInDestroyFromTComObjectRule extends DelphiRule {
     private static final int MAX_LOOK_AHEAD = 3;
 
     // потомки от них перекрывая destroy должны вызывать inherited
-    private Set parents = new HashSet(){{
+    private Set<String> parents = new HashSet<String>(){{
         add("TComObject".toUpperCase());
         add("TTypedComObject".toUpperCase());
         add("TAutoObject".toUpperCase());
@@ -21,7 +21,7 @@ public class InheritedInDestroyFromTComObjectRule extends DelphiRule {
         add("TComponentComObject".toUpperCase());
     }};
 
-    private Set descendants = new HashSet();
+    private Set<String> descendants = new HashSet<>();
 
     @Override
     public void visit(DelphiPMDNode node, RuleContext ctx) {

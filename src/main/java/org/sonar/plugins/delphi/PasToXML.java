@@ -13,7 +13,7 @@ public class PasToXML {
     public static void main(String[] args) {
 
         //File pmdFile = new File("k:\\sonar\\urmnew\\uCPParamAdapter.pas");
-        File pmdFile = new File("k:\\sonar\\urmnew\\uQSClient.pas");
+        File pmdFile = new File("k:\\sonar\\urmnew\\test.pas");
 
 
         if (pmdFile == null || !pmdFile.exists()) {

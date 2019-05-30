@@ -331,7 +331,7 @@
 		</properties>
 	</rule>
 
-	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.AssignedAndFreeRule" message="You don't have to check for assignement when calling Free"
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.AssignedAndFreeRule" message="You don't have to check for assignment when calling Free"
 		name="AssignedAndFreeRule">
 		<description>Free() method does check if the freed variable is not nil, you don't have to do it
 			manually.
@@ -345,6 +345,35 @@
 
 x.Free; 			//GOOD, sufficent enough or better
 <b>FreeAndNil(x);</b> // including repeated calls
+ 		]]></example>
+	</rule>
+
+
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.DestroyRule" message="You should not call destroy"
+		  name="DestroyRule">
+		<description>Don't call .Destroy. Call .Free
+		</description>
+		<example><![CDATA[
+x.Destroy;		//WRONG
+
+x.Free; 			//GOOD, sufficent enough or better
+<b>FreeAndNil(x);</b> // including repeated calls
+ 		]]></example>
+	</rule>
+
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.LeakLocalObjectRule" message="You forgot to destroy the created object"
+		  name="LeakLocalObjectRule">
+		<description>Call .Free or FreeAndNil(obj)
+		</description>
+		<example><![CDATA[
+procedure Test();
+var list : TList;
+begin
+  list := TList.Create;
+  list.add(nil);
+  ShowMessage(IntToStr(list.Count));
+  // !! forgot list.Free ???
+end;
  		]]></example>
 	</rule>
 
