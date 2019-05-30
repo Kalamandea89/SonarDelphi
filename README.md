@@ -1,16 +1,17 @@
 [![Build Status](https://travis-ci.org/SandroLuck/SonarDelphi.svg?branch=master)](https://travis-ci.org/SandroLuck/SonarDelphi)
 
 Version 1.0.1 
-  Add rule to detect leak object of TList, TStringList of local variables procedures and functions
-  Add rule for detect call .Destroy
+  * Add rule to detect leak object of TList, TStringList of local variables procedures and functions
+  * Add rule for detect call .Destroy
   
-================
+
 SonarQube Delphi
 ================
+
 Is a SonarQube (http://www.sonarqube.org/) plugin and provides
   * 57 Rules for Delphi
   * TestCoverage using AQtime (license needed)
-   * Optional .html output for TestCoverage
+  * Optional .html output for TestCoverage
 
 This is Plugin-Version 1.0.1 for SonarQube 7.1. 
 It is is mainly an updated version of https://github.com/fabriciocolombo/sonar-delphi and https://github.com/SandroLuck/SonarDelphi all credit goes to them.
