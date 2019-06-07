@@ -47,7 +47,8 @@ public class LeakLocalObjectRule extends DelphiRule {
         if (((node.getType() == DelphiLexer.FUNCTION) || (node.getType() == DelphiLexer.PROCEDURE)) &&
                 node.getParent().getType() != DelphiLexer.TkClass) // exclude methods in class declaration
             methodLevel++;
-        else if ((methodLevel > 0) && (node.getType() == DelphiLexer.TkVariableType)) {
+        else if ((methodLevel > 0) && (node.getType() == DelphiLexer.TkVariableType) &&
+                (node.getParent().getType() != DelphiLexer.TkFunctionArgs)) {
             if ((node.getChildCount() > 0) && analyzedClass.contains(node.getChild(0).getText().toUpperCase()))
                 addVars(node);
         } else if ((node.getType() == DelphiLexer.BEGIN) ||
@@ -94,17 +95,43 @@ public class LeakLocalObjectRule extends DelphiRule {
                 (node.getParent().getChild(node.getChildIndex() - 1).getType() == DelphiLexer.DOT) &&
                 (node.getParent().getChild(node.getChildIndex() - 2).getType() == DelphiLexer.TkIdentifier)
                 ) {
-            processFree(node.getParent().getChild(node.getChildIndex() - 2).getText().toUpperCase());
+            processFree(node.getParent().getChild(node.getChildIndex() - 2));
         } else if ("FreeAndNil".equalsIgnoreCase(node.getText()) &&
                 (node.getParent().getChildCount() > node.getChildIndex() + 3) &&
                 (node.getParent().getChild(node.getChildIndex() + 1).getType() == DelphiLexer.LPAREN) &&
                 (node.getParent().getChild(node.getChildIndex() + 2).getType() == DelphiLexer.TkIdentifier)
                 )
-            processFree(node.getParent().getChild(node.getChildIndex() + 2).getText().toUpperCase());
+            processFree(node.getParent().getChild(node.getChildIndex() + 2));
+        else if ((node.getType() == DelphiLexer.TkIdentifier) && // process pass as parameter to TList.Add()
+                (node.getChildIndex() > 4) &&
+                (node.getParent().getChild(node.getChildIndex() - 1).getType() == DelphiLexer.LPAREN) &&
+                node.getParent().getChild(node.getChildIndex() - 2).getText().equalsIgnoreCase("Add") &&
+                (node.getParent().getChild(node.getChildIndex() + 1).getType() == DelphiLexer.RPAREN))
+            processFree(node);
+        else if ((node.getType() == DelphiLexer.TkIdentifier) && // process TStringList.AddObject;
+                node.getText().equalsIgnoreCase("AddObject") &&
+                (node.getParent().getChild(node.getChildIndex() + 1).getType() == DelphiLexer.LPAREN))
+            processAddObject(node);
 
     }
 
-    private void processFree(String varName){
+    private void processAddObject(Tree node){
+        DelphiPMDNode parent = (DelphiPMDNode) node.getParent();
+        int index = node.getChildIndex();
+        // search: ); || )end || )except || )finally || )until  and take i - 1 it should be variable
+        for (int i = index + 1; i < parent.getChildCount() - 1; i++){
+            if (parent.getChild(i).getType() == DelphiLexer.RPAREN)
+                if ((parent.getChild(i + 1).getType() == DelphiLexer.SEMI) ||
+                        (parent.getChild(i + 1).getType() == DelphiLexer.END) ||
+                        (parent.getChild(i + 1).getType() == DelphiLexer.EXCEPT) ||
+                        (parent.getChild(i + 1).getType() == DelphiLexer.FINALLY) ||
+                        (parent.getChild(i + 1).getType() == DelphiLexer.UNTIL))
+                    processFree(parent.getChild(i - 1));
+        }
+    }
+
+    private void processFree(Tree node){
+        String varName = node.getText().toUpperCase();
         for(int i = methodLevel; i > 0; i-- ) {
             if (declaredVars.size() > i &&(declaredVars.get(i) != null) && (declaredVars.get(i).containsKey(varName))) {
                 declaredVars.get(i).put(varName, null);
@@ -115,7 +142,7 @@ public class LeakLocalObjectRule extends DelphiRule {
 
     private void addVars(DelphiPMDNode node){
         for (int i = 0; i <= methodLevel; i++)
-            declaredVars.add(new HashMap<>());
+            declaredVars.add(new HashMap<String, DelphiPMDNode>());
         Tree listVars = node.getParent().getChild(node.getChildIndex() - 1);
         for (int i = 0; i < listVars.getChildCount(); i++) {
             declaredVars.get(methodLevel).put(listVars.getChild(i).getText().toUpperCase(), null);

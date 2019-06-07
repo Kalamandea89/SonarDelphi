@@ -3,9 +3,7 @@ package org.sonar.plugins.delphi.pmd;
 import org.junit.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.empty;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
 
 public class LeakLocalObjectTest extends BasePmdRuleTest {
     @Test
@@ -34,6 +32,57 @@ public class LeakLocalObjectTest extends BasePmdRuleTest {
         analyse(builder);
 
         assertThat(issues.toString(), issues, hasSize(1)); // DestroyRule in results
+    }
+
+    @Test
+    public void validRule2() {
+        DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
+        builder.appendImpl("" +
+                "procedure Test(var list : TList);\n" +
+                "begin\n" +
+                "  list := TList.Create;\n" +
+                "  list.add(self);\n" +
+                "  list.add(this);\n" +
+                "end;\n" +
+                "");
+
+        analyse(builder);
+
+        assertThat(issues, is(empty()));
+    }
+
+    @Test
+    public void validRule3() {
+        DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
+        builder.appendImpl("" +
+                "procedure Test;\n" +
+                "var list: TList;\n" +
+                "begin\n" +
+                "  list := TList.Create;\n" +
+                "  GlobalList.Add(list);\n" +
+                "end;\n" +
+                "");
+
+        analyse(builder);
+
+        assertThat(issues, is(empty()));
+    }
+
+    @Test
+    public void validRule4() {
+        DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
+        builder.appendImpl("" +
+                "procedure Test;\n" +
+                "var list: TList;\n" +
+                "begin\n" +
+                "  list := TList.Create;\n" +
+                "  GlobalList.AddObject(str1 + 'str2', list);\n" +
+                "end;\n" +
+                "");
+
+        analyse(builder);
+
+        assertThat(issues, is(empty()));
     }
 
     @Test

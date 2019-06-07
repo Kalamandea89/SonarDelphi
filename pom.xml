@@ -5,7 +5,7 @@
 
 
 	<artifactId>sonar-delphi-plugin</artifactId>
-	<version>1.0.0</version>
+	<version>1.0.1</version>
 	<groupId>org.delphi.plugin</groupId>
 	<name>Sonar Delphi Plugin</name>
 	<description>Enables analysis of Delphi projects.</description>
@@ -17,7 +17,7 @@
 		<developer>
 			<id>mahalov</id>
 			<email>mahalov@krista.ru</email>
-			<name>Mahalog Yura</name>
+			<name>Mahalov Yura</name>
 			<roles>
 				<role>developer</role>
 			</roles>
@@ -326,8 +326,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>3.5.1</version>
 				<configuration>
-					<source>1.7</source>
-					<target>1.7</target>
+					<source>8</source>
+					<target>8</target>
 				</configuration>
 			</plugin>
 		</plugins>
