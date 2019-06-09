@@ -363,7 +363,7 @@ x.Free; 			//GOOD, sufficent enough or better
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.LeakLocalObjectRule" message="You forgot to destroy the created object"
 		  name="LeakLocalObjectRule">
-		<description>Call obj.Free or FreeAndNil(obj)
+		<description>Call obj.Free or FreeAndNil(obj). Strong check on assign and pass as parameter
 		</description>
 		<tags>bug</tags>
         <example><![CDATA[
@@ -377,6 +377,24 @@ begin
 end;
  		]]></example>
 	</rule>
+
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.MayBeLeakLocalObjectRule" message="May be you forgot to destroy the created object"
+		  name="MayBeLeakLocalObjectRule">
+		<description>Call obj.Free or FreeAndNil(obj). Check on pass as parameter don't perform.
+		</description>
+		<tags>bug</tags>
+		<example><![CDATA[
+procedure Test();
+var list : TList;
+begin
+  list := TList.Create;
+  list.add(nil);
+  ShowMessage(IntToStr(list.Count));
+  // !! forgot list.Free ???
+end;
+ 		]]></example>
+	</rule>
+
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.ThenRaiseElseRule" message="You don't must write else then riase exception"
 		  name="ThenRaiseElseRule">
