@@ -182,4 +182,12 @@
 		<priority>1</priority>
 	</rule>
 
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.InheritedInDestroyFromTComObjectRule" name="InheritedInDestroyFromTComObjectRule">
+		<priority>1</priority>
+	</rule>
+
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.LeakLocalObjectRule" name="LeakLocalObjectRule">
+		<priority>1</priority>
+	</rule>
+
 </ruleset>

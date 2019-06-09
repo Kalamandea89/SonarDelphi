@@ -363,9 +363,10 @@ x.Free; 			//GOOD, sufficent enough or better
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.LeakLocalObjectRule" message="You forgot to destroy the created object"
 		  name="LeakLocalObjectRule">
-		<description>Call .Free or FreeAndNil(obj)
+		<description>Call obj.Free or FreeAndNil(obj)
 		</description>
-		<example><![CDATA[
+		<tags>bug</tags>
+        <example><![CDATA[
 procedure Test();
 var list : TList;
 begin
@@ -520,6 +521,7 @@ x := a or x := not a;   //GOOD
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.InheritedInDestroyFromTComObjectRule" message="Destructor without 'inherited' statement in descedant TComObject"
 		  name="InheritedInDestroyFromTComObjectRule">
 		<description>Destructor without 'inherited' statement in descedant TComObject.</description>
+        <tags>bug</tags>
 	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.NoBeginAfterDoRule" message="No 'begin' after 'do' statement"

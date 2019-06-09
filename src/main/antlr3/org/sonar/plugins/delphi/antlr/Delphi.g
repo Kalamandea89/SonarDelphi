@@ -497,7 +497,7 @@ designatorItem               : '^'
                              | ('.' | '@') ident              //CHANGED added '@'
                              | ('<' genericTypeIdent (',' genericTypeIdent)* '>')       //ADDED for proc<sth, sth>.foo;
                              | '[' expressionList ']'
-                             | '(' (expression (colonConstruct)? (',' expression (colonConstruct)?)*)? ')' -> '(' (expression (colonConstruct)? (expression (colonConstruct)?)*)? ')'
+                             | '(' (expression (colonConstruct)? (',' expression (colonConstruct)?)*)? ')' //org.antlr.runtime.tree.RewriteCardinalityException: rule expression -> '(' (expression (colonConstruct)? (',' expression (colonConstruct)?)*)? ')'
                              ;
 expressionList               : expression (',' expression)*
                              ;

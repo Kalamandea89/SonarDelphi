@@ -86,6 +86,40 @@ public class LeakLocalObjectTest extends BasePmdRuleTest {
     }
 
     @Test
+    public void AssignOtherField() {
+        DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
+        builder.appendImpl("" +
+                "procedure Test;\n" +
+                "var list: TList;\n" +
+                "begin\n" +
+                "  list := TList.Create;\n" +
+                "  FClassField := list;\n" +
+                "end;\n" +
+                "");
+
+        analyse(builder);
+
+        assertThat(issues, is(empty()));
+    }
+
+    @Test
+    public void passAsMiddleParameter() {
+        DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
+        builder.appendImpl("" +
+                "procedure Test;\n" +
+                "var list: TList;\n" +
+                "begin\n" +
+                "  list := TList.Create;\n" +
+                "  RememberAndFree(one, list, -5 + abc);\n" +
+                "end;\n" +
+                "");
+
+        analyse(builder);
+
+        assertThat(issues, is(empty()));
+    }
+
+    @Test
     public void LeakLocalObjectIssue() {
         DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
         builder.appendImpl("" +

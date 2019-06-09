@@ -16,6 +16,7 @@ public class LeakLocalObjectRule extends DelphiRule {
     private Set<String> analyzedClass = new HashSet<String>(){{
         add("TList".toUpperCase());
         add("TStringList".toUpperCase());
+        add("TStaticSet".toUpperCase());
     }};
 
     @Override
@@ -95,40 +96,50 @@ public class LeakLocalObjectRule extends DelphiRule {
                 (node.getParent().getChild(node.getChildIndex() - 1).getType() == DelphiLexer.DOT) &&
                 (node.getParent().getChild(node.getChildIndex() - 2).getType() == DelphiLexer.TkIdentifier)
                 ) {
-            processFree(node.getParent().getChild(node.getChildIndex() - 2));
+            processFree(node.getParent().getChild(node.childIndex - 2));
         } else if ("FreeAndNil".equalsIgnoreCase(node.getText()) &&
-                (node.getParent().getChildCount() > node.getChildIndex() + 3) &&
-                (node.getParent().getChild(node.getChildIndex() + 1).getType() == DelphiLexer.LPAREN) &&
-                (node.getParent().getChild(node.getChildIndex() + 2).getType() == DelphiLexer.TkIdentifier)
+                (node.getParent().getChildCount() > node.childIndex + 3) &&
+                (node.getParent().getChild(node.childIndex + 1).getType() == DelphiLexer.LPAREN) &&
+                (node.getParent().getChild(node.childIndex + 2).getType() == DelphiLexer.TkIdentifier)
                 )
             processFree(node.getParent().getChild(node.getChildIndex() + 2));
-        else if ((node.getType() == DelphiLexer.TkIdentifier) && // process pass as parameter to TList.Add()
+        else if ((node.getType() == DelphiLexer.TkIdentifier) && // check pass first parameter
                 (node.getChildIndex() > 4) &&
-                (node.getParent().getChild(node.getChildIndex() - 1).getType() == DelphiLexer.LPAREN) &&
-                node.getParent().getChild(node.getChildIndex() - 2).getText().equalsIgnoreCase("Add") &&
-                (node.getParent().getChild(node.getChildIndex() + 1).getType() == DelphiLexer.RPAREN))
+                (node.getParent().getChild(node.childIndex - 1).getType() == DelphiLexer.LPAREN) &&
+                ((node.getParent().getChild(node.childIndex + 1).getType() == DelphiLexer.RPAREN) ||
+                        (node.getParent().getChild(node.childIndex + 1).getType() == DelphiLexer.COMMA))
+                )
             processFree(node);
-        else if ((node.getType() == DelphiLexer.TkIdentifier) && // process TStringList.AddObject;
-                node.getText().equalsIgnoreCase("AddObject") &&
-                (node.getParent().getChild(node.getChildIndex() + 1).getType() == DelphiLexer.LPAREN))
-            processAddObject(node);
+        else if ((node.getType() == DelphiLexer.COMMA) && // check pass as last parameter
+                (node.getParent().getChildCount() > node.childIndex + 2) &&
+                (node.getParent().getChild(node.childIndex + 2).getType() == DelphiLexer.RPAREN))
+            processFree(node.getParent().getChild(node.childIndex + 1));
+        else if ((node.getType() == DelphiLexer.COMMA) && // check pass as middle parameter
+                (node.getParent().getChildCount() > node.childIndex + 2) &&
+                (node.getParent().getChild(node.getChildIndex() + 2).getType() == DelphiLexer.COMMA))
+            processFree(node.getParent().getChild(node.childIndex + 1));
+        else if ((node.getType() == DelphiLexer.ASSIGN) && // check assign result := obj; and etc.
+                !((node.getParent().getChild(node.childIndex + 2).getType() == DelphiLexer.DOT ) ||
+                        (node.getParent().getChild(node.childIndex + 2).getType() == DelphiLexer.LBRACK)
+                ))
+            processFree(node.getParent().getChild(node.childIndex + 1));
 
     }
 
-    private void processAddObject(Tree node){
-        DelphiPMDNode parent = (DelphiPMDNode) node.getParent();
-        int index = node.getChildIndex();
-        // search: ); || )end || )except || )finally || )until  and take i - 1 it should be variable
-        for (int i = index + 1; i < parent.getChildCount() - 1; i++){
-            if (parent.getChild(i).getType() == DelphiLexer.RPAREN)
-                if ((parent.getChild(i + 1).getType() == DelphiLexer.SEMI) ||
-                        (parent.getChild(i + 1).getType() == DelphiLexer.END) ||
-                        (parent.getChild(i + 1).getType() == DelphiLexer.EXCEPT) ||
-                        (parent.getChild(i + 1).getType() == DelphiLexer.FINALLY) ||
-                        (parent.getChild(i + 1).getType() == DelphiLexer.UNTIL))
-                    processFree(parent.getChild(i - 1));
-        }
-    }
+//    private void processAddObject(Tree node){
+//        DelphiPMDNode parent = (DelphiPMDNode) node.getParent();
+//        int index = node.getChildIndex();
+//        // search: ); || )end || )except || )finally || )until  and take i - 1 it should be variable
+//        for (int i = index + 1; i < parent.getChildCount() - 1; i++){
+//            if (parent.getChild(i).getType() == DelphiLexer.RPAREN)
+//                if ((parent.getChild(i + 1).getType() == DelphiLexer.SEMI) ||
+//                        (parent.getChild(i + 1).getType() == DelphiLexer.END) ||
+//                        (parent.getChild(i + 1).getType() == DelphiLexer.EXCEPT) ||
+//                        (parent.getChild(i + 1).getType() == DelphiLexer.FINALLY) ||
+//                        (parent.getChild(i + 1).getType() == DelphiLexer.UNTIL))
+//                    processFree(parent.getChild(i - 1));
+//        }
+//    }
 
     private void processFree(Tree node){
         String varName = node.getText().toUpperCase();
