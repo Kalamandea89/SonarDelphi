@@ -382,7 +382,7 @@ end;
 		  name="MayBeLeakLocalObjectRule">
 		<description>Call obj.Free or FreeAndNil(obj). Check on pass as parameter don't perform.
 		</description>
-		<tags>bug</tags>
+		<tags>security</tags>
 		<example><![CDATA[
 procedure Test();
 var list : TList;
