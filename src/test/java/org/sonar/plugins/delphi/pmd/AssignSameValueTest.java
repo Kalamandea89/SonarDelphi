@@ -50,7 +50,7 @@ public class AssignSameValueTest extends BasePmdRuleTest {
         DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
         builder.appendImpl("procedure Test();");
 
-        builder.appendImpl("function TCanRun.DoPrimary: Variant;");
+        builder.appendImpl("function DoPrimary: Variant;");
         builder.appendImpl("var");
         builder.appendImpl("IsGuardExists: boolean;");
         builder.appendImpl("startup_info: TStartupInfo;");

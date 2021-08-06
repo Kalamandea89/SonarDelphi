@@ -20,7 +20,7 @@ public class LeakLocalObjectTest extends BasePmdRuleTest {
                 "    localList.Free;\n" +
                 "end;\n" +
                 "\n" +
-                "function TNalogForm.oiParamsProperties0CloseUpList: Boolean;\n" +
+                "function oiParamsProperties0CloseUpList: Boolean;\n" +
                 "var list: TList;\n" +
                 "begin\n" +
                 "  list := TList.Create;\n" +

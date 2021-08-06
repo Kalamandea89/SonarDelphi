@@ -162,6 +162,10 @@ public class DelphiRule extends AbstractJavaRule {
     return currentVisibility == DelphiLexer.PUBLISHED;
   }
 
+  protected boolean isPublic() {
+    return currentVisibility == DelphiLexer.PUBLIC;
+  }
+
   protected boolean isInterfaceSection() {
     return !isImplementationSection();
   }

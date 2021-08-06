@@ -33,8 +33,11 @@ public class FieldNameRuleTest extends BasePmdRuleTest {
     DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
     builder.appendDecl("type");
     builder.appendDecl("  TMyClass = class");
+    builder.appendDecl("   Fox: Integer;");
     builder.appendDecl("  private");
     builder.appendDecl("   FFoo: Integer;");
+    builder.appendDecl("  public");
+    builder.appendDecl("   Foo: Integer;");
     builder.appendDecl("  protected");
     builder.appendDecl("   FBar: String;");
     builder.appendDecl("  end;");
@@ -51,7 +54,7 @@ public class FieldNameRuleTest extends BasePmdRuleTest {
     builder.appendDecl("  TMyClass = class");
     builder.appendDecl("    private");
     builder.appendDecl("     Id: Integer;");
-    builder.appendDecl("     Code: Integer;");
+    builder.appendDecl("     fCode: Integer;");
     builder.appendDecl("    protected");
     builder.appendDecl("     Name: String;");
     builder.appendDecl("  end;");
@@ -59,7 +62,6 @@ public class FieldNameRuleTest extends BasePmdRuleTest {
     analyse(builder);
 
     assertThat(issues, hasItem(hasRuleKeyAtLine("FieldNameRule", builder.getOffsetDecl() + 4)));
-    assertThat(issues, hasItem(hasRuleKeyAtLine("FieldNameRule", builder.getOffsetDecl() + 5)));
     assertThat(issues, hasItem(hasRuleKeyAtLine("FieldNameRule", builder.getOffsetDecl() + 7)));
   }
 
@@ -81,8 +83,7 @@ public class FieldNameRuleTest extends BasePmdRuleTest {
 
     assertThat(issues, not(hasItem(hasRuleLine(builder.getOffsetDecl() + 3))));
     assertThat(issues, hasItem(hasRuleKeyAtLine("FieldNameRule", builder.getOffsetDecl() + 5)));
-    assertThat(issues, hasItem(hasRuleKeyAtLine("FieldNameRule", builder.getOffsetDecl() + 7)));
-    assertThat(issues, hasItem(hasRuleKeyAtLine("FieldNameRule", builder.getOffsetDecl() + 9)));
+
   }
 
   @Test
@@ -90,17 +91,22 @@ public class FieldNameRuleTest extends BasePmdRuleTest {
     DelphiUnitBuilderTest builder = new DelphiUnitBuilderTest();
     builder.appendDecl("type");
     builder.appendDecl("  TMyClass = class");
+    builder.appendDecl("     Ffoo: Integer;");
     builder.appendDecl("    private");
     builder.appendDecl("     Ffoo: Integer;");
     builder.appendDecl("    protected");
+    builder.appendDecl("     Fbar: String;");
+    builder.appendDecl("    public");
+    builder.appendDecl("     Fbar: String;");
+    builder.appendDecl("    published");
     builder.appendDecl("     Fbar: String;");
     builder.appendDecl("  end;");
 
     analyse(builder);
 
     assertThat(issues, hasSize(2));
-    assertThat(issues, hasItem(allOf(hasRuleKey("FieldNameRule"), hasRuleLine(builder.getOffsetDecl() + 4))));
-    assertThat(issues, hasItem(allOf(hasRuleKey("FieldNameRule"), hasRuleLine(builder.getOffsetDecl() + 6))));
+    assertThat(issues, hasItem(allOf(hasRuleKey("FieldNameRule"), hasRuleLine(builder.getOffsetDecl() + 5))));
+    assertThat(issues, hasItem(allOf(hasRuleKey("FieldNameRule"), hasRuleLine(builder.getOffsetDecl() + 7))));
   }
 
   @Test

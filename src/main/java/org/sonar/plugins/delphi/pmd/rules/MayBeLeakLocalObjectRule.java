@@ -11,13 +11,36 @@ public class MayBeLeakLocalObjectRule extends DelphiRule {
 
     private boolean isImplementation;
     private int methodLevel = 0; // уровень метода. для отслеживания переменных методов и модуля и вложенных методов
-    private int beginLevel = 0;  // для отслеживания конца метода, процедуру, функции.
+    private int beginLevel = 0;  // для отслеживания конца метода, процедуры, функции.
     boolean isProcessed; //
+    //список уровней метода. На каждом уровне мапа Переменная = Место где был создан объект
     private List<Map<String, DelphiPMDNode>> declaredVars = new ArrayList<>(30);
-    private Set<String> analyzedClass = new HashSet<String>(){{
+    public static Set<String> analyzedClass = new HashSet<String>(){{
         add("TList".toUpperCase());
         add("TStringList".toUpperCase());
         add("TStaticSet".toUpperCase());
+        add("TDelphiStream".toUpperCase());
+        add("TTransporter".toUpperCase());
+        add("TStringStream".toUpperCase());
+        add("TAxStream".toUpperCase());
+        add("TRegistry".toUpperCase());
+        add("TSafeStringList".toUpperCase());
+        add("TEnumStore".toUpperCase());
+        add("TTableStore".toUpperCase());
+        add("TBitmap".toUpperCase());
+        add("TTIFFBitMap".toUpperCase());
+        add("TJPEGImage".toUpperCase());
+        add("TPNGObject".toUpperCase());
+        add("TImage".toUpperCase());
+        add("TErrorLog".toUpperCase());
+        add("TObjectList".toUpperCase());
+        add("TMemoryStream".toUpperCase());
+        add("TInterfaceList".toUpperCase());
+        add("TParams".toUpperCase());
+        add("TObjectList".toUpperCase());
+        add("TOleStream".toUpperCase());
+        add("TIniFile".toUpperCase());
+        add("TFileStream".toUpperCase());
     }};
 
     @Override
@@ -48,7 +71,10 @@ public class MayBeLeakLocalObjectRule extends DelphiRule {
         if (!isImplementation)
             return;
 
-        if (((node.getType() == DelphiLexer.FUNCTION) || (node.getType() == DelphiLexer.PROCEDURE)) &&
+        if ((node.getType() == DelphiLexer.FUNCTION ||
+                node.getType() == DelphiLexer.PROCEDURE ||
+                node.getType() == DelphiLexer.CONSTRUCTOR ||
+                node.getType() == DelphiLexer.DESTRUCTOR) &&
                 node.getParent().getType() != DelphiLexer.TkClass) // exclude methods in class declaration
             methodLevel++;
         else if ((methodLevel > 0) && (node.getType() == DelphiLexer.TkVariableType) &&

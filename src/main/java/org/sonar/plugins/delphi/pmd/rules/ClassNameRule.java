@@ -29,10 +29,10 @@ public class ClassNameRule extends DelphiRule {
 
     if (node.getType() == DelphiLexer.TkClass) {
       String name = node.getParent().getText();
+      String fileName = ctx.getSourceCodeFile().getName();
 
-      char firstCharAfterPrefix = name.charAt(1);
-
-      if ((!name.startsWith("T") && !name.startsWith("E")) || firstCharAfterPrefix != Character.toUpperCase(firstCharAfterPrefix)) {
+      if ((!name.startsWith("T") && !name.startsWith("E")) && fileName.indexOf("_TLB") == -1
+      ) {
         addViolation(ctx, node);
       }
     }

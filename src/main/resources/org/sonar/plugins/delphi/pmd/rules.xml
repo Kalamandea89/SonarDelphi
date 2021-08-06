@@ -395,6 +395,36 @@ end;
  		]]></example>
 	</rule>
 
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.LeakClassObjectRule" message="May be you forgot to free class field"
+		  name="LeakClassObjectRule">
+		<description>Call obj.Free or FreeAndNil(obj). Check on pass as parameter don't perform.
+		</description>
+		<tags>security</tags>
+		<example><![CDATA[
+
+interface
+  Test = class
+    FList : TList;
+  end;
+
+implementation
+
+procedure Test.Test;
+begin
+  FList := TList.Create;
+  FList.add(nil);
+end;
+
+procedure Test.Show;
+begin
+  ShowMessage(IntToStr(FList.Count));
+end;
+
+// !! forgot FList.Free ???
+
+ 		]]></example>
+	</rule>
+
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.ThenRaiseElseRule" message="You don't must write else then riase exception"
 		  name="ThenRaiseElseRule">
