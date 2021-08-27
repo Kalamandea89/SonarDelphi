@@ -59,33 +59,32 @@ import static org.mockito.Mockito.when;
 
 public abstract class BasePmdRuleTest {
 
-  protected static final String ROOT_DIR_NAME = Paths.get("target/test-classes/org/sonar/plugins/delphi/PMDTest").toAbsolutePath().toString();
-  protected static final File ROOT_DIR = new File(ROOT_DIR_NAME);
+  private static final String ROOT_DIR_NAME = Paths.get("target/test-classes/org/sonar/plugins/delphi/PMDTest").toAbsolutePath().toString();
+  private static final File ROOT_DIR = new File(ROOT_DIR_NAME);
 
   private ResourcePerspectives perspectives;
   private DelphiProjectHelper delphiProjectHelper;
   private Issuable issuable;
 
-  protected DelphiPmdSensor sensor;
+  DelphiPmdSensor sensor;
   //protected Project project=new Project("porjectstring", "projectbranch", "projectname");
   protected Project project = new Project(ProjectDefinition.create());
-  protected List<Issue> issues = new LinkedList<Issue>();
+  protected List<Issue> issues = new LinkedList<>();
   private File testFile;
   private DelphiPmdProfileExporter profileExporter;
   private RulesProfile rulesProfile;
 
   public void analyse(DelphiUnitBuilderTest builder) {
-    configureTest(builder);
+    testFile = builder.buildFile(ROOT_DIR);
+    configureTest();
 
     DebugSensorContext sensorContext = new DebugSensorContext();
     sensor.analyse(project, sensorContext);
 
     assertThat("Errors: " + sensor.getErrors(), sensor.getErrors(), is(empty()));
-
   }
 
-  private void configureTest(DelphiUnitBuilderTest builder) {
-    testFile = builder.buildFile(ROOT_DIR);
+  private void configureTest() {
 
     //String relativePathTestFile = DelphiUtils.getRelativePath(testFile, Arrays.asList(ROOT_DIR));
 
@@ -134,7 +133,6 @@ public abstract class BasePmdRuleTest {
           @Override
           public Boolean answer(InvocationOnMock invocation) throws Throwable {
               System.out.println("HIER:"+ invocation.getArguments()[0]);
-              System.out.println("HIER2:"+invocation.getArguments()[0]);
               Issue issue = (Issue) invocation.getArguments()[0];
               issues.add(issue);
               return Boolean.TRUE;
@@ -156,68 +154,6 @@ public abstract class BasePmdRuleTest {
 
       sensor = new DelphiPmdSensor(delphiProjectHelper, perspectives, rulesProfile, profileExporter);
 
-  }
-
-  protected void configureTest(String testFileName) {
-    //project = mock(Project.class);
-    perspectives = mock(ResourcePerspectives.class);
-    delphiProjectHelper = DelphiTestUtils.mockProjectHelper();
-
-    // Don't pollute current working directory
-    when(delphiProjectHelper.workDir()).thenReturn(new File("target"));
-
-    File srcFile = DelphiUtils.getResource(testFileName);
-
-    //InputFile inputFile = new DefaultInputFile("ROOT_KEY_CHANGE_AT_SONARAPI_5", srcFile.getPath()).setModuleBaseDir(Paths.get(ROOT_DIR_NAME));
-      System.out.println(srcFile.getPath());
-    InputFile inputFile = TestInputFileBuilder.create("ROOT_KEY_CHANGE_AT_SONARAPI_5", new File(ROOT_DIR_NAME), srcFile).build();
-
-    DelphiProject delphiProject = new DelphiProject("Default Project");
-    delphiProject.setSourceFiles(Arrays.asList(inputFile));
-
-    issuable = mock(Issuable.class);
-
-    when(delphiProjectHelper.getWorkgroupProjects()).thenReturn(Arrays.asList(delphiProject));
-    when(delphiProjectHelper.getFile(anyString())).thenAnswer(new Answer<InputFile>() {
-      @Override
-      public InputFile answer(InvocationOnMock invocation) throws Throwable {
-        //InputFile inputFile = new DefaultInputFile("ROOT_KEY_CHANGE_AT_SONARAPI_5", (new File((String) invocation
-          //      .getArguments()[0])).getPath()).setModuleBaseDir(Paths.get(ROOT_DIR_NAME));
-        File file = new File((String) invocation.getArguments()[0]);
-        InputFile inputFile = TestInputFileBuilder.create("ROOT_KEY_CHANGE_AT_SONARAPI_5", file.getPath()).setModuleBaseDir(Paths.get(ROOT_DIR_NAME)).build();
-        when(perspectives.as(Issuable.class, inputFile)).thenReturn(issuable);
-
-        when(issuable.newIssueBuilder()).thenReturn(new StubIssueBuilder());
-
-        return inputFile;
-      }
-    });
-
-    when(issuable.addIssue(Matchers.any(Issue.class))).then(new Answer<Boolean>() {
-      @Override
-      public Boolean answer(InvocationOnMock invocation) throws Throwable {
-          System.out.println("HIER:"+ invocation.getArguments()[0]);
-          System.out.println("HIER2:"+invocation.getArguments()[0]);
-          Issue issue = (Issue) invocation.getArguments()[0];
-        issues.add(issue);
-        return Boolean.TRUE;
-      }
-    });
-    rulesProfile = mock(RulesProfile.class);
-    profileExporter = mock(DelphiPmdProfileExporter.class);
-
-    String fileName = getClass().getResource("/org/sonar/plugins/delphi/pmd/rules.xml").getPath();
-    File rulesFile = new File(fileName);
-    String rulesXmlContent;
-    try {
-      rulesXmlContent = FileUtils.readFileToString(rulesFile);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
-
-    when(profileExporter.exportProfileToString(rulesProfile)).thenReturn(rulesXmlContent);
-
-    sensor = new DelphiPmdSensor(delphiProjectHelper, perspectives, rulesProfile, profileExporter);
   }
 
   @After

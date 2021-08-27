@@ -378,6 +378,29 @@ end;
  		]]></example>
 	</rule>
 
+
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.FreeLocalObjectInFinallyRule" message="Free local object in finally section"
+		  name="FreeLocalObjectInFinallyRule">
+		<description>Call obj.Free or FreeAndNil(obj) for local object in finally section
+		</description>
+		<tags>bug</tags>
+		<example><![CDATA[
+procedure Test();
+var list : TList;
+begin
+  list := TList.Create;
+  list.add(nil);
+  ShowMessage(IntToStr(list.Count));
+  ...
+  list.Free; //WRONG
+  // !! list leak if exception will be raised.
+  finally
+    list.Free; //GOOD
+  end;
+end;
+ 		]]></example>
+	</rule>
+
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.MayBeLeakLocalObjectRule" message="May be you forgot to destroy the created object"
 		  name="MayBeLeakLocalObjectRule">
 		<description>Call obj.Free or FreeAndNil(obj). Check on pass as parameter don't perform.

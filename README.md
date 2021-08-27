@@ -1,6 +1,7 @@
 [![Build Status](https://travis-ci.org/SandroLuck/SonarDelphi.svg?branch=master)](https://travis-ci.org/SandroLuck/SonarDelphi)
 
 Last Changes
+  * Add rule Free local object in finally section
   * Add rule to detect leak many classes of class fields
   * Leak local variables also see many classes
 

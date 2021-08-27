@@ -568,6 +568,8 @@ compoundStatement            : 'begin' (statementList)? 'end' -> ^('begin' (stat
                              ;
 statementList                : (statement)? (';' (statement)?)*
                              ;
+statementList2               : (statement)? (';' (statement)?)*
+                             ;
 simpleStatement              : designator ':=' expression
                              | designator // call
                              | gotoStatement
@@ -589,8 +591,8 @@ recordConstExpression        : '(' ident ':' expression (';' ident ':' expressio
 //****************************
 //section exceptionStatement
 //****************************
-tryStatement                 : 'try' (statementList)? 'except' handlerList 'end'  
-                             | 'try' (statementList)? 'finally' (statementList)? 'end'
+tryStatement                 : 'try' (statementList)? 'except' handlerList 'end' //have a RewriteEmptyStreamException rule handlerList -> ^('try' (statementList)? 'except' handlerList 'end')
+                             | 'try' (statementList)? 'finally' (statementList2)? 'end' -> ^('try' (statementList)? ^('finally' (statementList2)? 'end'))
                              ;
 handlerList                  : (handler)* ('else' statementList)?
                              | statementList

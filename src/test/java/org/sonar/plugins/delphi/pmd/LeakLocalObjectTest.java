@@ -14,18 +14,22 @@ public class LeakLocalObjectTest extends BasePmdRuleTest {
                 "var localList : TStringList;\n" +
                 "begin\n" +
                 "  localList := TStringList.Create;\n" +
-                "    begin\n" +
-                "        result := result + ' ' + curStr;\n" +
-                "    end;\n" +
+                "  try\n" +
+                "    result := result + ' ' + curStr;\n" +
+                "  finally\n" +
                 "    localList.Free;\n" +
+                "  end;\n" +
                 "end;\n" +
                 "\n" +
                 "function oiParamsProperties0CloseUpList: Boolean;\n" +
                 "var list: TList;\n" +
                 "begin\n" +
                 "  list := TList.Create;\n" +
-                "  sleep(0);\n" +
-                "  list.Destroy;\n" +
+                "  try\n" +
+                "    sleep(0);\n" +
+                "  finally\n" +
+                "    list.Destroy;\n" +
+                "  end;\n" +
                 "end;\n" +
                 "");
 

@@ -30,9 +30,9 @@ public class DestroyRuleTest extends BasePmdRuleTest {
         builder.appendImpl("    sleep(0);");
         builder.appendImpl("  finally");
         builder.appendImpl("    sleep(0);");
+        builder.appendImpl("    V.Free;");
+        builder.appendImpl("    V.Destroy;");
         builder.appendImpl("  end;");
-        builder.appendImpl("  V.Free;");
-        builder.appendImpl("  V.Destroy;");
         builder.appendImpl("end;");
 
         analyse(builder);
