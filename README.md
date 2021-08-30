@@ -14,7 +14,7 @@ SonarQube Delphi
 ================
 
 Is a SonarQube (http://www.sonarqube.org/) plugin and provides
-  * 58 Rules for Delphi
+  * 59 Rules for Delphi
   * TestCoverage using AQtime (license needed)
   * Optional .html output for TestCoverage
 
