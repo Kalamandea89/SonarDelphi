@@ -75,7 +75,7 @@ public abstract class BasePmdRuleTest {
   private RulesProfile rulesProfile;
 
   public void analyse(DelphiUnitBuilderTest builder) {
-    testFile = builder.buildFile(ROOT_DIR);
+    testFile = builder.buildFile(ROOT_DIR, builder.getFileSufix());
     configureTest();
 
     DebugSensorContext sensorContext = new DebugSensorContext();

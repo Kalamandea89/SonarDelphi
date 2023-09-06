@@ -5,7 +5,7 @@ Last Changes
   * Add rule to detect leak many classes of class fields
   * Leak local variables also see many classes
 
-Version 1.0.1 
+Version 1.0.3 
   * Add rule to detect leak object of TList, TStringList of local variables procedures and functions
   * Add rule for detect call .Destroy
   
@@ -18,7 +18,7 @@ Is a SonarQube (http://www.sonarqube.org/) plugin and provides
   * TestCoverage using AQtime (license needed)
   * Optional .html output for TestCoverage
 
-This is Plugin-Version 1.0.1 for SonarQube 7.1. 
+This is Plugin-Version 1.0.3 for SonarQube 7.1. 
 It is is mainly an updated version of https://github.com/fabriciocolombo/sonar-delphi and https://github.com/SandroLuck/SonarDelphi all credit goes to them.
 I have hosted it here since the orignal developer isn't active anymore.
 

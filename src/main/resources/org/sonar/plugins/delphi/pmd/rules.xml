@@ -16,7 +16,8 @@
 	(...)		
 	<b>end;</b>		
 <b>except</b>		
-(...)		
+<b>except</b>
+(...)
 <b>end;		
  		]]></example>
 	</rule>
@@ -378,6 +379,22 @@ end;
  		]]></example>
 	</rule>
 
+	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.LeakDprObjectRule" message="You forgot to destroy the created object in dpr"
+		  name="LeakDprObjectRule">
+		<description>Call obj.Free or FreeAndNil(obj). Strong check on assign and pass as parameter
+		</description>
+		<tags>bug</tags>
+		<example><![CDATA[
+procedure Test();
+var list : TList;
+begin
+  list := TList.Create;
+  list.add(nil);
+  ShowMessage(IntToStr(list.Count));
+  // !! forgot list.Free ???
+end;
+ 		]]></example>
+	</rule>
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.FreeLocalObjectInFinallyRule" message="Free local object in finally section"
 		  name="FreeLocalObjectInFinallyRule">
@@ -533,6 +550,7 @@ x := a or x := not a;   //GOOD
 
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.DprFunctionRule" message=".dpr/.dpk file should not have procedures/functions."
 		name="ProjectFileNoFunctionsRule">
+		<tags>security</tags>
 		<description>.dpr/.dpk files should not have procedures/functions.</description>
 	</rule>
 

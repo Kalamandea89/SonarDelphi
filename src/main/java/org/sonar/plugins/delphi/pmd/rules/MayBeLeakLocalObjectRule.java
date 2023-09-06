@@ -43,6 +43,10 @@ public class MayBeLeakLocalObjectRule extends DelphiRule {
         add("TFileStream".toUpperCase());
     }};
 
+    public int getBeginLevel() {
+        return beginLevel;
+    }
+
     @Override
     protected void init() {
         isImplementation = false;
@@ -70,14 +74,22 @@ public class MayBeLeakLocalObjectRule extends DelphiRule {
 
         if (!isImplementation)
             return;
+        calcLevel(node, ctx);
+        if (beginLevel == 0)
+            return;
+        // отслеживаем создание; определяем переменную.
+        // ищем освобождение, и присваивание. Передачу параметром здесь не учитываем.
+        isProcessed = checkCreateAndFree(node);
+    }
 
+    void calcLevel(DelphiPMDNode node, RuleContext ctx){
         if ((node.getType() == DelphiLexer.FUNCTION ||
                 node.getType() == DelphiLexer.PROCEDURE ||
                 node.getType() == DelphiLexer.CONSTRUCTOR ||
                 node.getType() == DelphiLexer.DESTRUCTOR) &&
                 node.getParent().getType() != DelphiLexer.TkClass) // exclude methods in class declaration
             methodLevel++;
-        else if ((methodLevel > 0) && (node.getType() == DelphiLexer.TkVariableType) &&
+        else if ((methodLevel >= 0) && (node.getType() == DelphiLexer.TkVariableType) &&
                 (node.getParent().getType() != DelphiLexer.TkFunctionArgs)) {
             if ((node.getChildCount() > 0) && analyzedClass.contains(node.getChild(0).getText().toUpperCase()))
                 addVars(node);
@@ -86,28 +98,21 @@ public class MayBeLeakLocalObjectRule extends DelphiRule {
                 (node.getType() == DelphiLexer.CASE)
         )
             beginLevel++;
-        else if ((node.getType() == DelphiLexer.END) &&
-                (beginLevel > 0)) {
-
+        else if ((node.getType() == DelphiLexer.END) && (beginLevel > 0)) {
             beginLevel--;
-            if ((beginLevel == 0) && // end of procedure or subprocedure
-                    methodLevel > 0){
+            if ((beginLevel == 0) && methodLevel >= 0) { // end of procedure or subprocedure
                 if (declaredVars.size() > methodLevel) {
                     for (Map.Entry<String, DelphiPMDNode> entry : declaredVars.get(methodLevel).entrySet())
                         if (entry.getValue() != null)
                             addViolation(ctx, entry.getValue());
-
                     declaredVars.get(methodLevel).clear();
                 }
                 methodLevel--;
             }
         }
+    }
 
-        if (beginLevel == 0)
-            return;
-
-        // отслеживаем создание; определяем переменную.
-        // ищем освобождение, и присваивание. Передачу параметром здесь не учитываем.
+    boolean checkCreateAndFree(DelphiPMDNode node){
         if ((node.getType() == DelphiLexer.TkIdentifier) && // check on create
                 analyzedClass.contains(node.getText().toUpperCase()) &&
                 (node.getParent().getChildCount() > (node.getChildIndex() + 2)) &&
@@ -137,13 +142,13 @@ public class MayBeLeakLocalObjectRule extends DelphiRule {
                 ))
             processFree(node.getParent().getChild(node.childIndex + 1));
         else
-            isProcessed = false;
-
+            return false;
+        return true;
     }
 
     void processFree(Tree node){
         String varName = node.getText().toUpperCase();
-        for(int i = methodLevel; i > 0; i-- ) {
+        for(int i = methodLevel; i >= 0; i-- ) {
             if (declaredVars.size() > i &&(declaredVars.get(i) != null) && (declaredVars.get(i).containsKey(varName))) {
                 declaredVars.get(i).put(varName, null);
                 return;
@@ -161,7 +166,7 @@ public class MayBeLeakLocalObjectRule extends DelphiRule {
     }
 
     private void addCreate(DelphiPMDNode varNode){
-        for(int i = methodLevel; i > 0; i-- ) {
+        for(int i = methodLevel; i >= 0; i-- ) {
             if (declaredVars.size() > i &&
                     (declaredVars.get(i) != null) &&
                     (declaredVars.get(i).containsKey(varNode.getText().toUpperCase()))

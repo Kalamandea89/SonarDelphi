@@ -37,6 +37,15 @@ public class DelphiUnitBuilderTest {
     private int offset;
     private int offsetDecl;
     private String unitName = "Unit1";
+    private String fileSufix = ".pas";
+
+    public void setFileSufix(String fileSufix) {
+        this.fileSufix = fileSufix;
+    }
+
+    public String getFileSufix() {
+        return fileSufix;
+    }
 
     public DelphiUnitBuilderTest appendDecl(String value) {
         declaration.append(value).append("\n");
@@ -62,11 +71,11 @@ public class DelphiUnitBuilderTest {
         return this;
     }
 
-    File buildFile(File baseDir) {
+    File buildFile(File baseDir, String sufix) {
         StringBuilder source = getSourceCode();
 
         try {
-            File file = File.createTempFile("unit", ".pas", baseDir);
+            File file = File.createTempFile("unit", sufix, baseDir);
             file.deleteOnExit();
 
             try (FileWriter fileWriter = new FileWriter(file)) {
@@ -86,17 +95,23 @@ public class DelphiUnitBuilderTest {
         offset = offset + 6;
 
         StringBuilder source = new StringBuilder();
-        source.append(String.format("unit %s;\n", this.unitName));
-        source.append("\n");
-        source.append("interface\n");
-        source.append("\n");
+        if (fileSufix.equals(".pas")){
+            source.append(String.format("unit %s;\n", this.unitName));
+            source.append("\n");
+            source.append("interface\n");
+            source.append("\n");
+        }else {
+            source.append(String.format("program %s;\n", this.unitName));
+        }
 
         if (this.declaration.length() > 0) {
             source.append(this.declaration()).append("\n");
             offset++;
         }
-        source.append("implementation\n");
-        source.append("\n");
+        if (fileSufix.equals(".pas")){
+            source.append("implementation\n");
+            source.append("\n");
+        }
 
         if (this.implementation.length() > 0) {
             source.append(this.implementation()).append("\n");
