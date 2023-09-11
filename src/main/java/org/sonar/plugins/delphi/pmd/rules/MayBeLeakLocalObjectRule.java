@@ -43,10 +43,6 @@ public class MayBeLeakLocalObjectRule extends DelphiRule {
         add("TFileStream".toUpperCase());
     }};
 
-    public int getBeginLevel() {
-        return beginLevel;
-    }
-
     @Override
     protected void init() {
         isImplementation = false;

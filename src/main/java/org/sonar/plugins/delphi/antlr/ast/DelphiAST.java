@@ -204,7 +204,7 @@ public class DelphiAST extends CommonTree implements ASTTree {
   /**
    * Some characters are forbidden as XML node, so process them
    * 
-   * @param str String to process
+   * @param node to process
    * @return Fixed string
    */
   private String processNodeName(Tree node) {

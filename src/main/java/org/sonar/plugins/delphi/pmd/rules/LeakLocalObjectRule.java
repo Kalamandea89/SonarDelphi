@@ -8,7 +8,6 @@ public class LeakLocalObjectRule extends MayBeLeakLocalObjectRule {
 
     //TODO: forward directive in implementation section break method level counting
     // operator 'with' can make false result
-
     @Override
     public void visit(DelphiPMDNode node, RuleContext ctx) {
         super.visit(node, ctx);

@@ -87,7 +87,7 @@ public class LeakClassObjectRule extends DelphiRule {
         if (methodLevel == 0)
             inClassName = null;
 
-        if (beginLevel == 0)
+        if (methodLevel == 0)
             return;
 
         // отслеживаем создание; определяем переменную.
