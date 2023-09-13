@@ -244,6 +244,7 @@ public class LeakClassObjectTest extends BasePmdRuleTest {
                 "begin\n" +
                 "  FList := TList.Create;\n" +
                 "  FList.add(nil);\n" +
+                "  slist2 := TList.Create;\n" +
                 "end;\n" +
                 "end.\n" +
                 "");

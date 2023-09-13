@@ -396,6 +396,22 @@ end;
  		]]></example>
 	</rule>
 
+    <rule since="" class="org.sonar.plugins.delphi.pmd.rules.LeakClassHandlerRule" message="You forgot to close handler in class functions"
+          name="LeakClassHandlerRule">
+        <description>Call CloseHandle. Strong check on assign and pass as parameter
+        </description>
+        <tags>security</tags>
+        <example><![CDATA[
+procedure Test();
+var hDebugModeEvent: THandle;
+begin
+  hDebugModeEvent := CreateEvent(GRAND_ALL_ACCESS, TRUE, FALSE, DEBUG_EVENT_NAME);
+  InitLogWork;
+  // !! forgot  CloseHandle(hDebugModeEvent) ???
+end;
+ 		]]></example>
+    </rule>
+
 	<rule since="" class="org.sonar.plugins.delphi.pmd.rules.FreeLocalObjectInFinallyRule" message="Free local object in finally section"
 		  name="FreeLocalObjectInFinallyRule">
 		<description>Call obj.Free or FreeAndNil(obj) for local object in finally section

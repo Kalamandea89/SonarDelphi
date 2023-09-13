@@ -17,12 +17,12 @@ public class LeakClassObjectRule extends DelphiRule {
         Tree destroy;
     }
 
-    private boolean isImplementation;
-    private int methodLevel = 0; // уровень метода. для отслеживания переменных методов и модуля и вложенных методов
-    private int beginLevel = 0;  // для отслеживания конца метода, процедуры, функции.
-    private String inClassName;
+    boolean isImplementation;
+    int methodLevel = 0; // уровень метода. для отслеживания переменных методов и модуля и вложенных методов
+    int beginLevel = 0;  // для отслеживания конца метода, процедуры, функции.
+    String inClassName;
     // мапа класс = мапа переменная = место создания объекта
-    private Map<String, Map<String, CreateFreeInfo>> declaredFields = new HashMap<>(30);
+    Map<String, Map<String, CreateFreeInfo>> declaredFields = new HashMap<>(30);
 
     @Override
     protected void init() {
@@ -54,7 +54,7 @@ public class LeakClassObjectRule extends DelphiRule {
             // выходить можем и два раза. что бы не публиковать проблемы два раза чистим их после первой публикации
             declaredFields.clear();
         } else if (node.getType() == DelphiLexer.TkClassField) {
-            parseClassFields(node); // обрабатываем поля класса в декларациях и реализации
+            parseClassFields(node, analyzedClass); // обрабатываем поля класса в декларациях и реализации
             return;
         }
 
@@ -84,11 +84,10 @@ public class LeakClassObjectRule extends DelphiRule {
             }
         }
 
-        if (methodLevel == 0)
+        if (methodLevel == 0){
             inClassName = null;
-
-        if (methodLevel == 0)
             return;
+        }
 
         // отслеживаем создание; определяем переменную.
         // ищем освобождение, и присваивание. Передачу параметром здесь не учитываем.
@@ -130,7 +129,7 @@ public class LeakClassObjectRule extends DelphiRule {
 
     }
 
-    private void parseClassFields(DelphiPMDNode node) {
+    protected void parseClassFields(DelphiPMDNode node, Set<String> analyze) {
         if (node.getParent().getType() != DelphiLexer.TkClass && node.getParent().getType() != DelphiLexer.TkObject)
             throw new RuntimeException("parent is not TkClass and TkObject");
 
@@ -142,7 +141,7 @@ public class LeakClassObjectRule extends DelphiRule {
         if (node.getChild(1).getType() != DelphiLexer.TkVariableType)
             throw new RuntimeException(" child 2 of class field node has not type TKVariableType");
 
-        if (analyzedClass.contains(node.getChild(1).getChild(0).getText().toUpperCase())) {
+        if (analyze.contains(node.getChild(1).getChild(0).getText().toUpperCase())) {
             Map<String, CreateFreeInfo> fields = declaredFields.get(className);
             if (fields == null) {
                 fields = new HashMap<>();
@@ -155,10 +154,9 @@ public class LeakClassObjectRule extends DelphiRule {
                 fields.put(field.getChild(i).getText().toUpperCase(), new CreateFreeInfo());
             }
         }
-
     }
 
-    private void processFree(Tree node) {
+    protected void processFree(Tree node) {
         if (inClassName == null)
             return; // освобождение в свободной процедуре или теле dpr файла
 
@@ -167,7 +165,7 @@ public class LeakClassObjectRule extends DelphiRule {
             declaredFields.get(inClassName).get(varName).destroy = node;
     }
 
-    private void addCreate(DelphiPMDNode varNode) {
+    protected void addCreate(DelphiPMDNode varNode) {
         if (inClassName == null)
             return; //создание в свободной процедуре или теле dpr файла
 
