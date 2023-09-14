@@ -5,10 +5,16 @@ Last Changes
   * Add rule to detect leak many classes of class fields
   * Leak local variables also see many classes
 
+Version 1.0.4
+* Add rule to detect leak object of TList, TStringList in .dpr files
+* Add rule to detect leak THandle in class fields
+* Add rule to detect leak THandle in .dpr files
+* Add rule to detect leak THandle in local variables procedures and functions
+
 Version 1.0.3 
   * Add rule to detect leak object of TList, TStringList of local variables procedures and functions
   * Add rule for detect call .Destroy
-  
+
 
 SonarQube Delphi
 ================
@@ -78,8 +84,6 @@ Implemented Features
 * Unused files recognition
 * Unused functions
 * Unused procedures
-* Not call Free after create object
-* Not call CloseHandle after create handler
 * (Optional with AQtime)
   * Coverage using AQtime
   * Sufficient Coverage on new Code 
