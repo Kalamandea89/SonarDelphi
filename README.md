@@ -78,7 +78,9 @@ Implemented Features
 * Unused files recognition
 * Unused functions
 * Unused procedures
-(Optional with AQtime)
+* Not call Free after create object
+* Not call CloseHandle after create handler
+* (Optional with AQtime)
   * Coverage using AQtime
   * Sufficient Coverage on new Code 
   
