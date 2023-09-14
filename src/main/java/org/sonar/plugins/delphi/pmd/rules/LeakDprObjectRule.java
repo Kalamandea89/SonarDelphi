@@ -5,7 +5,7 @@ import org.sonar.plugins.delphi.antlr.ast.DelphiPMDNode;
 
 public class LeakDprObjectRule extends MayBeLeakLocalObjectRule {
 
-    private int check;
+    int check;
 
     @Override
     public void init() {
@@ -28,7 +28,7 @@ public class LeakDprObjectRule extends MayBeLeakLocalObjectRule {
             return;
         }
         isProcessed = true;
-        calcLevel(node, ctx);
+        calcLevel(node, ctx, analyzedClass);
         isProcessed = checkCreateAndFree(node);
     }
 }

@@ -12,14 +12,14 @@ import java.util.Set;
 
 public class LeakClassHandlerRule extends LeakClassObjectRule {
 
-    private static Set<String> analyzedMethod = new HashSet<String>(){{
+    static Set<String> analyzedMethod = new HashSet<String>(){{
         add("CreateMutex".toUpperCase());
         add("CreateEvent".toUpperCase());
         add("CreateSemaphore".toUpperCase());
         add("FindWindow".toUpperCase());
         add("CreateFile".toUpperCase());
     }};
-    private static Set<String> analyzedClass = new HashSet<String>(){{
+    static Set<String> analyzedClass = new HashSet<String>(){{
         add("THANDLE");
     }};
 

@@ -9,13 +9,13 @@ import java.util.*;
 
 public class MayBeLeakLocalObjectRule extends DelphiRule {
 
-    private boolean isImplementation;
+    boolean isImplementation;
     private int methodLevel = 0; // уровень метода. для отслеживания переменных методов и модуля и вложенных методов
-    private int beginLevel = 0;  // для отслеживания конца метода, процедуры, функции.
+    int beginLevel = 0;  // для отслеживания конца метода, процедуры, функции.
     boolean isProcessed; //
     //список уровней метода. На каждом уровне мапа Переменная = Место где был создан объект
     private List<Map<String, DelphiPMDNode>> declaredVars = new ArrayList<>(30);
-    public static Set<String> analyzedClass = new HashSet<String>(){{
+    static Set<String> analyzedClass = new HashSet<String>(){{
         add("TList".toUpperCase());
         add("TStringList".toUpperCase());
         add("TStaticSet".toUpperCase());
@@ -70,7 +70,7 @@ public class MayBeLeakLocalObjectRule extends DelphiRule {
 
         if (!isImplementation)
             return;
-        calcLevel(node, ctx);
+        calcLevel(node, ctx, analyzedClass);
         if (beginLevel == 0)
             return;
         // отслеживаем создание; определяем переменную.
@@ -78,7 +78,7 @@ public class MayBeLeakLocalObjectRule extends DelphiRule {
         isProcessed = checkCreateAndFree(node);
     }
 
-    void calcLevel(DelphiPMDNode node, RuleContext ctx){
+    void calcLevel(DelphiPMDNode node, RuleContext ctx, Set<String> analyze){
         if ((node.getType() == DelphiLexer.FUNCTION ||
                 node.getType() == DelphiLexer.PROCEDURE ||
                 node.getType() == DelphiLexer.CONSTRUCTOR ||
@@ -87,7 +87,7 @@ public class MayBeLeakLocalObjectRule extends DelphiRule {
             methodLevel++;
         else if ((methodLevel >= 0) && (node.getType() == DelphiLexer.TkVariableType) &&
                 (node.getParent().getType() != DelphiLexer.TkFunctionArgs)) {
-            if ((node.getChildCount() > 0) && analyzedClass.contains(node.getChild(0).getText().toUpperCase()))
+            if ((node.getChildCount() > 0) && analyze.contains(node.getChild(0).getText().toUpperCase()))
                 addVars(node);
         } else if ((node.getType() == DelphiLexer.BEGIN) ||
                 (node.getType() == DelphiLexer.TRY) ||
@@ -161,7 +161,7 @@ public class MayBeLeakLocalObjectRule extends DelphiRule {
         }
     }
 
-    private void addCreate(DelphiPMDNode varNode){
+    void addCreate(DelphiPMDNode varNode){
         for(int i = methodLevel; i >= 0; i-- ) {
             if (declaredVars.size() > i &&
                     (declaredVars.get(i) != null) &&
