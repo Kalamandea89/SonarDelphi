@@ -16,7 +16,6 @@ public class LeakClassHandlerRule extends LeakClassObjectRule {
         add("CreateMutex".toUpperCase());
         add("CreateEvent".toUpperCase());
         add("CreateSemaphore".toUpperCase());
-        add("FindWindow".toUpperCase());
         add("CreateFile".toUpperCase());
     }};
     static Set<String> analyzedClass = new HashSet<String>(){{
